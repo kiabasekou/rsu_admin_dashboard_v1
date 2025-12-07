@@ -1,3 +1,0 @@
-# public/_redirects
-# Redirect toutes les routes vers index.html pour React Router
-/*    /index.html   200

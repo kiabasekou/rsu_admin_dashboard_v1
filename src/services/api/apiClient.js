@@ -1,13 +1,39 @@
 /**
- * 🇬🇦 RSU Gabon - API Client FIX DÉFINITIF
+ * 🇬🇦 RSU Gabon - API Client CORRIGÉ
  * Standards Top 1% - Client HTTP avec JWT
  * Fichier: rsu_admin_dashboard/src/services/api/apiClient.js
+ * 
+ * ✅ CORRECTION: URL dynamique basée sur environnement
  */
 
 class APIClient {
   constructor() {
-    // ✅ FIX DÉFINITIF: URL hardcodée avec /api/v1
-    this.baseURL = 'http://localhost:8000/api/v1';
+    // ✅ CORRECTION DÉFINITIVE: URL dynamique selon environnement
+    this.baseURL = this.getBaseURL();
+    
+    // Log pour debugging
+    console.log('🔧 APIClient initialisé avec URL:', this.baseURL);
+  }
+
+  /**
+   * Déterminer l'URL de base selon l'environnement
+   */
+  getBaseURL() {
+    // Priorité 1: Variable d'environnement explicite
+    if (process.env.REACT_APP_API_URL) {
+      return process.env.REACT_APP_API_URL;
+    }
+    
+    // Priorité 2: Détection automatique environnement
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    if (isDevelopment) {
+      // Développement local
+      return 'http://localhost:8000/api/v1';
+    } else {
+      // Production Render
+      return 'https://rsu-gabon-backend.onrender.com/api/v1';
+    }
   }
 
   /**
@@ -36,15 +62,28 @@ class APIClient {
     const url = `${this.baseURL}${endpoint}`;
     console.log(`🌐 ${options.method || 'GET'} ${url}`);
 
-    const response = await fetch(url, config);
+    try {
+      const response = await fetch(url, config);
 
-    if (!response.ok) {
-      console.error(`❌ API Error: ${response.status} ${response.statusText}`);
-      throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        console.error(`❌ API Error: ${response.status} ${response.statusText}`);
+        
+        // Gestion erreur 401 (non autorisé)
+        if (response.status === 401) {
+          console.warn('⚠️ Token expiré, déconnexion...');
+          this.logout();
+          return;
+        }
+        
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('❌ Erreur requête:', error.message);
+      throw error;
     }
-
-    const data = await response.json();
-    return data;
   }
 
   /**
@@ -93,18 +132,23 @@ class APIClient {
     return this.request(endpoint, { method: 'DELETE' });
   }
 
+  /**
+   * Déconnexion
+   */
   logout() {
-     localStorage.removeItem('access_token');
-     localStorage.removeItem('refresh_token');
-     localStorage.removeItem('user');
-     window.location.href = '/login';
-   }
+    console.log('🚪 Déconnexion...');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  }
 
-   isAuthenticated() {
-     return !!localStorage.getItem('access_token');
-   }
-  
-   
+  /**
+   * Vérifier si utilisateur est authentifié
+   */
+  isAuthenticated() {
+    return !!localStorage.getItem('access_token');
+  }
 }
 
 // Export instance singleton
