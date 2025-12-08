@@ -32,7 +32,7 @@ class APIClient {
       return 'http://localhost:8000/api/v1';
     } else {
       // Production Render
-      return 'https://rsu-gabon-backend.onrender.com/api/v1';
+      return 'https://rsu-identity-backend.onrender.com/api/v1';
     }
   }
 
