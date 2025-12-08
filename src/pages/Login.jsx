@@ -147,7 +147,7 @@ export default function Login() {
           RSU Gabon
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Registre Social Unifié
+          Registre Social Unique
         </p>
 
         {/* Message succès */}
@@ -297,7 +297,7 @@ export default function Login() {
             © 2025 République Gabonaise
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            Registre Social Unifié • Version 1.0.0
+            Registre Social Unique • Version 1.0.0
           </p>
         </div>
       </div>
