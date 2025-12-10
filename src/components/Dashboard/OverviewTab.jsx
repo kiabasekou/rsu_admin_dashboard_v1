@@ -23,9 +23,9 @@ export default function OverviewTab({ data, loading, error }) {
   console.log('📊 OverviewTab received data:', data);
   
   // ✅ SÉCURITÉ: Destructuration avec valeurs par défaut
-  const provinceData = data?.province_data || [];
-  const monthlyData = data?.monthly_enrollments || [];
-  const stats = data?.overview || {};
+  const provinceData = data?.province_distribution || [];  // ✅ Corrigé
+  const monthlyData = data?.monthly_enrollments || [];     // ✅ Déjà correct
+  const stats = data?.stats || {};                         // ✅ Corrigé
   const vulnerabilityData = data?.vulnerability_distribution || [];
   
   console.log('📊 Province data:', provinceData);
