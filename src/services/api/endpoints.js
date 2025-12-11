@@ -1,7 +1,7 @@
 /**
- * 🇬🇦 RSU Gabon - API Endpoints
- * Standards Top 1% - Configuration centralisée COMPLÈTE
- * Fichier: rsu_admin_dashboard/src/services/api/endpoints.js
+ * 🇬🇦 RSU Gabon - API Endpoints COMPLET
+ * Standards Top 1% - Configuration centralisée avec Analytics & Deduplication
+ * Fichier: rsu_admin_dashboard_v1/src/services/api/endpoints.js
  */
 
 const ENDPOINTS = {
@@ -12,11 +12,75 @@ const ENDPOINTS = {
     LOGOUT: '/auth/logout/',
   },
 
-  // ==================== ANALYTICS (DASHBOARD) ====================
+  // ==================== ANALYTICS (DASHBOARD & IA) ====================
   ANALYTICS: {
+    // Dashboard
     DASHBOARD: '/analytics/dashboard/',
     PROVINCE_STATS: '/analytics/province-stats/',
-    REPORTS: '/analytics/reports/',
+    
+    // KPI Metrics
+    KPI_METRICS: '/analytics/kpi-metrics/',
+    KPI_DETAIL: (id) => `/analytics/kpi-metrics/${id}/`,
+    KPI_CALCULATE: (id) => `/analytics/kpi-metrics/${id}/calculate/`,
+    KPI_HISTORY: (id) => `/analytics/kpi-metrics/${id}/history/`,
+    
+    // Dashboard Configs
+    DASHBOARD_CONFIGS: '/analytics/dashboard-configs/',
+    DASHBOARD_CONFIG_DETAIL: (id) => `/analytics/dashboard-configs/${id}/`,
+    DASHBOARD_CONFIG_ACTIVATE: (id) => `/analytics/dashboard-configs/${id}/activate/`,
+    DASHBOARD_CONFIG_DUPLICATE: (id) => `/analytics/dashboard-configs/${id}/duplicate/`,
+    
+    // Reports
+    REPORT_TEMPLATES: '/analytics/report-templates/',
+    REPORT_TEMPLATE_DETAIL: (id) => `/analytics/report-templates/${id}/`,
+    REPORT_GENERATE: (id) => `/analytics/report-templates/${id}/generate/`,
+    REPORT_DOWNLOAD: (id) => `/analytics/report-templates/${id}/download/`,
+    REPORT_SCHEDULE: (id) => `/analytics/report-templates/${id}/schedule/`,
+    
+    // Data Exports
+    DATA_EXPORTS: '/analytics/data-exports/',
+    DATA_EXPORT_DETAIL: (id) => `/analytics/data-exports/${id}/`,
+    DATA_EXPORT_DOWNLOAD: (id) => `/analytics/data-exports/${id}/download/`,
+    DATA_EXPORT_STATUS: (id) => `/analytics/data-exports/${id}/status/`,
+    
+    // Services Analytics
+    DEMOGRAPHIC_INSIGHTS: '/services/analytics/demographic_insights/',
+    GEOGRAPHIC_DISTRIBUTION: '/services/analytics/geographic_distribution/',
+    VULNERABILITY_STATS: '/services/analytics/vulnerability_stats/',
+  },
+
+  // ==================== DEDUPLICATION (IA ANTI-FRAUDE) ====================
+  DEDUPLICATION: {
+    // Détections
+    DETECTIONS: '/deduplication/detections/',
+    DETECTION_DETAIL: (id) => `/deduplication/detections/${id}/`,
+    DETECT_FOR_PERSON: '/deduplication/detections/detect_for_person/',
+    BATCH_DETECT_ALL: '/deduplication/detections/batch_detect_all/',
+    DETECTION_STATISTICS: '/deduplication/detections/statistics/',
+    
+    // Similarity Scores
+    SCORES: '/deduplication/scores/',
+    SCORE_DETAIL: (id) => `/deduplication/scores/${id}/`,
+    SCORES_HIGH_CONFIDENCE: '/deduplication/scores/high_confidence/',
+    SCORES_REQUIRES_REVIEW: '/deduplication/scores/requires_review/',
+    SCORES_FRAUD_SUSPECTED: '/deduplication/scores/fraud_suspected/',
+    SCORE_MARK_REVIEWED: (id) => `/deduplication/scores/${id}/mark_reviewed/`,
+    
+    // Merge Candidates
+    MERGES: '/deduplication/merges/',
+    MERGE_DETAIL: (id) => `/deduplication/merges/${id}/`,
+    MERGES_PENDING: '/deduplication/merges/pending/',
+    MERGE_STATISTICS: '/deduplication/merges/statistics/',
+    MERGE_EXECUTE: (id) => `/deduplication/merges/${id}/execute_merge/`,
+    MERGE_ROLLBACK: (id) => `/deduplication/merges/${id}/rollback/`,
+    
+    // ML Models
+    ML_MODELS: '/deduplication/ml-models/',
+    ML_MODEL_DETAIL: (id) => `/deduplication/ml-models/${id}/`,
+    ML_MODELS_PRODUCTION: '/deduplication/ml-models/production_models/',
+    ML_STATISTICS: '/deduplication/ml-models/statistics/',
+    ML_COMPARE_MODELS: '/deduplication/ml-models/compare_models/',
+    ML_DEPLOY: (id) => `/deduplication/ml-models/${id}/deploy/`,
   },
 
   // ==================== IDENTITY (BÉNÉFICIAIRES) ====================
@@ -26,6 +90,7 @@ const ENDPOINTS = {
     PERSON_DETAIL: (id) => `/identity/persons/${id}/`,
     SEARCH: '/identity/persons/search/',
     CHECK_DUPLICATES: '/identity/persons/check-duplicates/',
+    SEARCH_DUPLICATES: '/identity/persons/search_duplicates/',
     STATISTICS: '/identity/persons/statistics/',
     
     // Ménages
@@ -73,42 +138,44 @@ const ENDPOINTS = {
     BATCH_PROCESS: '/programs/payments/batch_process/',
   },
 
-  // ==================== SERVICES (VULNÉRABILITÉ & IA) ====================
+  // ==================== SERVICES (VULNÉRABILITÉ & ÉLIGIBILITÉ) ====================
   SERVICES: {
-    // Évaluation vulnérabilité
-    VULNERABILITY: '/services/vulnerability-assessment/',
-    VULNERABILITY_DETAIL: (id) => `/services/vulnerability-assessment/${id}/`,
-    CALCULATE_SCORE: '/services/vulnerability-assessment/calculate/',
-    BULK_CALCULATE: '/services/vulnerability-assessment/bulk_calculate/',
-    VULNERABILITY_STATISTICS: '/services/vulnerability-assessment/statistics/',
+    // Vulnerability Assessment
+    VULNERABILITY_SCORES: '/services/vulnerability-scores/',
+    VULNERABILITY_SCORE_DETAIL: (id) => `/services/vulnerability-scores/${id}/`,
+    CALCULATE_SCORE: '/services/vulnerability-scores/calculate/',
+    VULNERABILITY_STATISTICS: '/services/vulnerability-scores/statistics/',
     
-    // Éligibilité programmes
-    ELIGIBILITY: '/services/program-eligibility/',
-    CHECK_PROGRAM_ELIGIBILITY: '/services/program-eligibility/check/',
+    // Eligibility Checks
+    ELIGIBILITY_CHECKS: '/services/eligibility-checks/',
+    ELIGIBILITY_CHECK_DETAIL: (id) => `/services/eligibility-checks/${id}/`,
+    CHECK_ELIGIBILITY: '/services/eligibility-checks/check/',
+    BULK_CHECK: '/services/eligibility-checks/bulk_check/',
     
-    // Géotargeting
-    GEOTARGETING: '/services/geotargeting/',
-    PRIORITY_ZONES: '/services/geotargeting/priority_zones/',
-    
-    // Budget programmes
-    PROGRAM_BUDGETS: '/services/social-programs/',
-    BUDGET_DASHBOARD: '/services/social-programs/budget_dashboard/',
-    BUDGET_HISTORY: (id) => `/services/social-programs/${id}/budget_history/`,
+    // Analytics Services
+    ANALYTICS_DASHBOARD: '/services/analytics/dashboard/',
+    DEMOGRAPHIC_INSIGHTS: '/services/analytics/demographic_insights/',
+    GEOGRAPHIC_DISTRIBUTION: '/services/analytics/geographic_distribution/',
+    VULNERABILITY_STATS: '/services/analytics/vulnerability_stats/',
   },
 
-  // ==================== CORE (UTILISATEURS & AUDIT) ====================
+  // ==================== SURVEYS ====================
+  SURVEYS: {
+    TEMPLATES: '/surveys/templates/',
+    SESSIONS: '/surveys/sessions/',
+    RESPONSES: '/surveys/responses/',
+  },
+
+  // ==================== FAMILY GRAPH ====================
+  FAMILY_GRAPH: {
+    RELATIONSHIPS: '/family-graph/relationships/',
+    NETWORKS: '/family-graph/networks/',
+  },
+
+  // ==================== CORE ====================
   CORE: {
-    // Utilisateurs
     USERS: '/core/users/',
-    USER_DETAIL: (id) => `/core/users/${id}/`,
-    CURRENT_USER: '/core/users/me/',
-    UPDATE_PROFILE: '/core/users/update_profile/',
-    CHANGE_PASSWORD: '/core/users/change_password/',
-    
-    // Audit logs
     AUDIT_LOGS: '/core/audit-logs/',
-    AUDIT_STATS: '/core/audit-logs/stats/',
-    USER_ACTIVITY: (userId) => `/core/audit-logs/user_activity/?user=${userId}`,
   },
 };
 

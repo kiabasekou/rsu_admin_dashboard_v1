@@ -1,15 +1,17 @@
 /**
- * 🇬🇦 RSU Gabon - Dashboard Principal CORRIGÉ
- * Standards Top 1% - Intégration APIs Django REST
- * Fichier: rsu_admin_dashboard/src/pages/Dashboard.jsx
+ * 🇬🇦 RSU Gabon - Dashboard Principal ENRICHI
+ * Standards Top 1% - Intégration Analytics & Deduplication IA
+ * Fichier: rsu_admin_dashboard_v1/src/pages/Dashboard.jsx
  */
 
 import React, { useState, useCallback } from 'react';
 import Header from '../components/Layout/Header';
 import TabNavigation from '../components/Dashboard/TabNavigation';
-import OverviewTab from '../components/Dashboard/OverviewTab'; // ✅ IMPORT DU BON COMPOSANT
+import OverviewTab from '../components/Dashboard/OverviewTab';
 import BeneficiariesTab from '../components/Dashboard/BeneficiariesTab';
 import ProgramsTab from '../components/Dashboard/ProgramsTab';
+import AnalyticsTab from '../components/Dashboard/AnalyticsTab'; // NOUVEAU
+import DeduplicationTab from '../components/Dashboard/DeduplicationTab'; // NOUVEAU
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useDashboard, useBeneficiaries } from '../hooks/useDashboard';
 import { usePrograms } from '../hooks/usePrograms';
@@ -69,105 +71,101 @@ export default function Dashboard() {
         return refreshBeneficiaries;
       case 'programs':
         return refreshPrograms;
+      case 'analytics':
+        return refreshDashboard; // Partage le hook dashboard
+      case 'deduplication':
+        return refreshDashboard;
       default:
         return () => console.log('No refresh action for this tab.');
     }
   };
 
-  const getCurrentLoading = dashboardLoading || beneficiariesLoading || programsLoading;
-
   // ================================================================================
-  // GESTION ERREUR GLOBALE
-  // ================================================================================
-
-  if (dashboardError && !dashboardLoading && activeTab === 'overview') {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
-          <AlertCircle className="text-red-600 mx-auto mb-4" size={64} />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Erreur de Connexion</h2>
-          <p className="text-gray-600 mb-4">
-            {typeof dashboardError === 'string' ? dashboardError : "Une erreur inattendue est survenue."}
-          </p>
-          <div className="space-y-2">
-            <button
-              onClick={refreshDashboard}
-              className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Réessayer
-            </button>
-            <p className="text-xs text-gray-500">
-              Vérifiez que le backend Django est démarré sur {process.env.REACT_APP_API_URL || 'http://localhost:8000'}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ================================================================================
-  // RENDU PRINCIPAL
+  // RENDER
   // ================================================================================
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Header 
-        currentUser={currentUser}
-        onRefresh={getCurrentRefresh()}
-        loading={getCurrentLoading}
-      />
-
-      <TabNavigation 
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <Header
+        user={currentUser}
+        onSearch={handleSearch}
+        onExport={handleExport}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
       />
 
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Indicateur mise à jour */}
-        {lastUpdate && activeTab === 'overview' && (
-          <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle size={18} className="text-blue-600" />
-              <span className="text-sm text-blue-800">
-                Données actualisées : {lastUpdate.toLocaleTimeString('fr-FR')}
-              </span>
+        {/* Status Banner */}
+        {lastUpdate && (
+          <div className="mb-6 bg-blue-50 border-l-4 border-blue-600 p-4 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="text-blue-600" size={20} />
+              <p className="text-sm text-blue-800">
+                <span className="font-semibold">Données synchronisées</span>
+                {' '}• Dernière mise à jour:{' '}
+                {new Date(lastUpdate).toLocaleTimeString('fr-FR')}
+              </p>
             </div>
-            <span className="text-xs text-blue-600 font-mono">
-              Backend: {process.env.REACT_APP_API_URL || 'http://localhost:8000'}
-            </span>
+            <button
+              onClick={getCurrentRefresh()}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Actualiser maintenant
+            </button>
           </div>
         )}
 
-        {/* ✅ ONGLET VUE D'ENSEMBLE - CORRECTION ICI */}
-        {activeTab === 'overview' && (
-          <OverviewTab 
-            data={dashboardData}
-            loading={dashboardLoading}
-            error={dashboardError}
-          />
-        )}
-
-        {/* ✅ ONGLET BÉNÉFICIAIRES */}
-        {activeTab === 'beneficiaries' && (
-          <BeneficiariesTab />
-        )}
-
-        {/* ✅ ONGLET PROGRAMMES */}
-        {activeTab === 'programs' && (
-          <ProgramsTab />
-        )}
-
-        {/* ✅ ONGLET ANALYTICS */}
-        {activeTab === 'analytics' && (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              🤖 Module Analytics IA
-            </h3>
-            <p className="text-gray-600">
-              Fonctionnalités avancées d'analyse prédictive en développement
+        {/* Error Banner */}
+        {dashboardError && (
+          <div className="mb-6 bg-red-50 border-l-4 border-red-600 p-4 rounded-lg flex items-center gap-3">
+            <AlertCircle className="text-red-600" size={20} />
+            <p className="text-sm text-red-800">
+              <span className="font-semibold">Erreur de connexion:</span>
+              {' '}{dashboardError}
             </p>
           </div>
         )}
+
+        {/* Tab Navigation */}
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Tab Content */}
+        <div className="mt-6">
+          {activeTab === 'overview' && (
+            <OverviewTab
+              data={dashboardData}
+              loading={dashboardLoading}
+              onRefresh={refreshDashboard}
+            />
+          )}
+
+          {activeTab === 'beneficiaries' && (
+            <BeneficiariesTab
+              beneficiaries={beneficiaries}
+              loading={beneficiariesLoading}
+              pagination={beneficiariesPagination}
+              onRefresh={refreshBeneficiaries}
+            />
+          )}
+
+          {activeTab === 'programs' && (
+            <ProgramsTab
+              programs={programs}
+              loading={programsLoading}
+              onRefresh={refreshPrograms}
+            />
+          )}
+
+          {/* ✨ NOUVEAUX ONGLETS IA */}
+          {activeTab === 'analytics' && (
+            <AnalyticsTab />
+          )}
+
+          {activeTab === 'deduplication' && (
+            <DeduplicationTab />
+          )}
+        </div>
       </main>
     </div>
   );
