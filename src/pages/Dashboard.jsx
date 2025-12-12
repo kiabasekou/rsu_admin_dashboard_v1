@@ -1,21 +1,49 @@
 /**
- * 🇬🇦 RSU Gabon - Dashboard Principal ENRICHI
- * Standards Top 1% - Intégration Analytics & Deduplication IA
- * Fichier: rsu_admin_dashboard_v1/src/pages/Dashboard.jsx
+ * 🇬🇦 RSU Gabon - Dashboard avec Lazy Loading + Prefetch
+ * Standards Top 1% - Performance Maximale
+ * Fichier: src/pages/Dashboard.jsx (VERSION OPTIMISÉE)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, lazy, Suspense, useEffect } from 'react';
 import Header from '../components/Layout/Header';
 import TabNavigation from '../components/Dashboard/TabNavigation';
-import OverviewTab from '../components/Dashboard/OverviewTab';
-import BeneficiariesTab from '../components/Dashboard/BeneficiariesTab';
-import ProgramsTab from '../components/Dashboard/ProgramsTab';
-import AnalyticsTab from '../components/Dashboard/AnalyticsTab'; // NOUVEAU
-import DeduplicationTab from '../components/Dashboard/DeduplicationTab'; // NOUVEAU
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useDashboard, useBeneficiaries } from '../hooks/useDashboard';
 import { usePrograms } from '../hooks/usePrograms';
 import apiClient from '../services/api/apiClient';
+import { prefetchDashboardTabs } from '../utils/prefetch';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+
+// ============================================================================
+// LAZY LOADING
+// ============================================================================
+
+// Overview chargé immédiatement (onglet par défaut)
+import OverviewTab from '../components/Dashboard/OverviewTab';
+
+// Autres onglets chargés à la demande
+const BeneficiariesTab = lazy(() => import('../components/Dashboard/BeneficiariesTab'));
+const ProgramsTab = lazy(() => import('../components/Dashboard/ProgramsTab'));
+const AnalyticsTab = lazy(() => import('../components/Dashboard/AnalyticsTab'));
+const DeduplicationTab = lazy(() => import('../components/Dashboard/DeduplicationTab'));
+
+// ============================================================================
+// LOADING FALLBACK
+// ============================================================================
+
+function TabLoadingFallback() {
+  return (
+    <LoadingSpinner 
+      size="lg" 
+      text="Chargement du module..." 
+      variant="spinner"
+    />
+  );
+}
+
+// ============================================================================
+// DASHBOARD COMPONENT
+// ============================================================================
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -24,9 +52,18 @@ export default function Dashboard() {
     user_type: 'ADMIN'
   });
 
-  // ================================================================================
+  // ============================================================================
+  // PREFETCH INTELLIGENT
+  // ============================================================================
+
+  useEffect(() => {
+    // Précharger les autres onglets après le chargement de Overview
+    prefetchDashboardTabs();
+  }, []);
+
+  // ============================================================================
   // HOOKS DE DONNÉES
-  // ================================================================================
+  // ============================================================================
 
   const {
     data: dashboardData,
@@ -51,9 +88,9 @@ export default function Dashboard() {
     refresh: refreshPrograms,
   } = usePrograms();
 
-  // ================================================================================
+  // ============================================================================
   // HANDLERS
-  // ================================================================================
+  // ============================================================================
 
   const handleSearch = useCallback((params) => {
     console.log(`🔍 Recherche dans l'onglet ${activeTab} avec:`, params);
@@ -72,7 +109,7 @@ export default function Dashboard() {
       case 'programs':
         return refreshPrograms;
       case 'analytics':
-        return refreshDashboard; // Partage le hook dashboard
+        return refreshDashboard;
       case 'deduplication':
         return refreshDashboard;
       default:
@@ -80,9 +117,9 @@ export default function Dashboard() {
     }
   };
 
-  // ================================================================================
+  // ============================================================================
   // RENDER
-  // ================================================================================
+  // ============================================================================
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -130,41 +167,42 @@ export default function Dashboard() {
         {/* Tab Navigation */}
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Tab Content */}
+        {/* Tab Content avec Suspense pour Lazy Loading */}
         <div className="mt-6">
-          {activeTab === 'overview' && (
-            <OverviewTab
-              data={dashboardData}
-              loading={dashboardLoading}
-              onRefresh={refreshDashboard}
-            />
-          )}
+          <Suspense fallback={<TabLoadingFallback />}>
+            {activeTab === 'overview' && (
+              <OverviewTab
+                data={dashboardData}
+                loading={dashboardLoading}
+                onRefresh={refreshDashboard}
+              />
+            )}
 
-          {activeTab === 'beneficiaries' && (
-            <BeneficiariesTab
-              beneficiaries={beneficiaries}
-              loading={beneficiariesLoading}
-              pagination={beneficiariesPagination}
-              onRefresh={refreshBeneficiaries}
-            />
-          )}
+            {activeTab === 'beneficiaries' && (
+              <BeneficiariesTab
+                beneficiaries={beneficiaries}
+                loading={beneficiariesLoading}
+                pagination={beneficiariesPagination}
+                onRefresh={refreshBeneficiaries}
+              />
+            )}
 
-          {activeTab === 'programs' && (
-            <ProgramsTab
-              programs={programs}
-              loading={programsLoading}
-              onRefresh={refreshPrograms}
-            />
-          )}
+            {activeTab === 'programs' && (
+              <ProgramsTab
+                programs={programs}
+                loading={programsLoading}
+                onRefresh={refreshPrograms}
+              />
+            )}
 
-          {/* ✨ NOUVEAUX ONGLETS IA */}
-          {activeTab === 'analytics' && (
-            <AnalyticsTab />
-          )}
+            {activeTab === 'analytics' && (
+              <AnalyticsTab />
+            )}
 
-          {activeTab === 'deduplication' && (
-            <DeduplicationTab />
-          )}
+            {activeTab === 'deduplication' && (
+              <DeduplicationTab />
+            )}
+          </Suspense>
         </div>
       </main>
     </div>

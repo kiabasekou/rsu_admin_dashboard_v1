@@ -1,17 +1,19 @@
 /**
- * 🇬🇦 RSU Gabon - ErrorBoundary Component
- * Standards Top 1% - Capture erreurs React
+ * 🇬🇦 RSU Gabon - Error Boundary
+ * Standards Top 1% - Gestion erreurs lazy loading
+ * Fichier: src/components/Common/ErrorBoundary.jsx
  */
-import React, { Component } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
 
-export default class ErrorBoundary extends Component {
+import React from 'react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+
+class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hasError: false,
+    this.state = { 
+      hasError: false, 
       error: null,
-      errorInfo: null,
+      errorInfo: null 
     };
   }
 
@@ -20,63 +22,105 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('ErrorBoundary caught:', error, errorInfo);
+    console.error('❌ ErrorBoundary caught:', error, errorInfo);
     this.setState({
       error,
-      errorInfo,
+      errorInfo
     });
 
-    // TODO: Envoyer à Sentry ou service logging
-    // logErrorToService(error, errorInfo);
+    // Log vers service externe si configuré (Sentry, etc.)
+    if (window.logErrorToService) {
+      window.logErrorToService(error, errorInfo);
+    }
   }
 
   handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
+    this.setState({ 
+      hasError: false, 
+      error: null, 
+      errorInfo: null 
     });
+    window.location.reload();
+  };
+
+  handleGoHome = () => {
+    window.location.href = '/dashboard';
   };
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-            <AlertTriangle className="mx-auto text-red-600 mb-4" size={64} />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Une erreur est survenue
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Une erreur inattendue s'est produite. Veuillez rafraîchir la page ou contacter le support.
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white rounded-lg shadow-xl p-8">
+            {/* Icône d'erreur */}
+            <div className="flex justify-center mb-6">
+              <div className="p-4 bg-red-100 rounded-full">
+                <AlertTriangle className="text-red-600" size={64} />
+              </div>
+            </div>
+
+            {/* Titre */}
+            <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
+              Oups ! Une erreur est survenue
+            </h1>
+
+            {/* Message */}
+            <p className="text-gray-600 text-center mb-6">
+              Nous avons rencontré un problème lors du chargement de cette page.
+              Veuillez réessayer ou contacter le support si le problème persiste.
             </p>
 
+            {/* Détails erreur (mode développement uniquement) */}
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="text-left bg-red-50 border border-red-200 rounded p-4 mb-6">
-                <summary className="font-semibold text-red-800 cursor-pointer mb-2">
-                  Détails de l'erreur (DEV)
+              <details className="mb-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <summary className="cursor-pointer text-sm font-medium text-gray-700 mb-2">
+                  Détails techniques (dev only)
                 </summary>
-                <pre className="text-xs text-red-700 overflow-auto">
-                  {this.state.error.toString()}
-                  {this.state.errorInfo?.componentStack}
-                </pre>
+                <div className="text-xs font-mono text-red-600 overflow-auto max-h-64">
+                  <p className="font-bold mb-2">Erreur :</p>
+                  <p className="mb-4">{this.state.error.toString()}</p>
+                  
+                  {this.state.errorInfo && (
+                    <>
+                      <p className="font-bold mb-2">Stack trace :</p>
+                      <pre className="whitespace-pre-wrap">
+                        {this.state.errorInfo.componentStack}
+                      </pre>
+                    </>
+                  )}
+                </div>
               </details>
             )}
 
-            <div className="flex gap-3 justify-center">
+            {/* Actions */}
+            <div className="flex gap-4 justify-center">
               <button
                 onClick={this.handleReset}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
               >
-                <RefreshCw size={18} />
-                Réessayer
+                <RefreshCw size={20} />
+                Recharger la page
               </button>
+
               <button
-                onClick={() => window.location.href = '/dashboard'}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+                onClick={this.handleGoHome}
+                className="flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
               >
+                <Home size={20} />
                 Retour à l'accueil
               </button>
+            </div>
+
+            {/* Info support */}
+            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+              <p className="text-sm text-gray-500">
+                Code d'erreur : <span className="font-mono font-semibold">
+                  {Date.now().toString(36).toUpperCase()}
+                </span>
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Besoin d'aide ? Contactez le support technique avec ce code.
+              </p>
             </div>
           </div>
         </div>
@@ -85,4 +129,21 @@ export default class ErrorBoundary extends Component {
 
     return this.props.children;
   }
+}
+
+export default ErrorBoundary;
+
+/**
+ * Hook pour reset error boundary depuis un composant enfant
+ */
+export function useErrorHandler() {
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    if (error) {
+      throw error;
+    }
+  }, [error]);
+
+  return setError;
 }
