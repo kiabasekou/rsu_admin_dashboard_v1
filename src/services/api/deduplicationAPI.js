@@ -53,6 +53,13 @@ export const deduplicationAPI = {
   },
 
   /**
+   * Statistiques globales deduplication
+   */
+  getStatistics: async () => {
+    return await apiClient.get('/deduplication/statistics/');
+  },
+
+  /**
    * Marquer comme faux positif
    */
   markFalsePositive: async (detectionId, notes = '') => {

@@ -86,7 +86,7 @@ export default function KPIMetrics() {
       });
 
       // Gérer pagination Django ou liste directe
-      const data = response.data.results || response.data;
+      const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
       
       if (Array.isArray(data)) {
         setKpis(data);

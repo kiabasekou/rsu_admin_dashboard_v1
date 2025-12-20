@@ -204,6 +204,12 @@ export const analyticsAPI = {
       params: { metric, period }
     });
   },
+  /**
+   * Tendances dashboard
+   */
+  getDashboardTrends: async () => {
+    return await apiClient.get('/analytics/dashboard/trends/');
+  },
 
   /**
    * Prédictions IA
