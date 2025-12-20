@@ -1,0 +1,29 @@
+🎨 Dashboard 6 onglets - Analytics + Deduplication + FamilyGraph
+
+ANALYTICS TAB:
+- Intègre KPIMetrics.jsx, TrendsCharts.jsx, ReportExports.jsx
+- Navigation interne 3 vues (KPIs, Tendances, Rapports)
+- Badge AI-POWERED
+- État loading/error/empty
+
+DEDUPLICATION TAB:
+- Intègre MergeWorkflow.jsx, SimilarityScores.jsx, MLDashboard.jsx
+- 4 cartes stats (Détections, Fusions, ML actifs)
+- Navigation interne 3 vues
+- Callbacks refresh après actions
+
+FAMILY GRAPH TAB (NEW):
+- 3 vues: Relations Familiales, Réseaux Ménages, Dépendances
+- 4 cartes stats header
+- Placeholder avec données test
+- Prêt pour intégration API
+
+DASHBOARD PRINCIPAL:
+- 6 onglets total (Overview, Bénéficiaires, Programmes, Analytics, Deduplication, FamilyGraph)
+- Badges AI (Analytics/Dedup), NEW (FamilyGraph)
+- Navigation cohérente
+
+Known Issues:
+- Analytics: getDashboardTrends() manquante
+- Deduplication: getStatistics() manquante
+- KPIMetrics: accès response.data.results à corriger
