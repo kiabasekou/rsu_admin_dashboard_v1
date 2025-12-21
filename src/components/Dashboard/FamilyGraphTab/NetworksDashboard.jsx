@@ -84,7 +84,8 @@ export default function NetworksDashboard() {
     }
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${style.bg} ${style.text}`}>
+      /* Correction : On utilise config.bg et config.text au lieu de style.bg et style.text */
+      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
         {config.label} ({score}%)
       </span>
     );
