@@ -56,7 +56,7 @@ export const deduplicationAPI = {
    * Statistiques globales deduplication
    */
   getStatistics: async () => {
-    return await apiClient.get('/deduplication/statistics/');
+    return await apiClient.get('/deduplication/detections/statistics/');
   },
 
   /**

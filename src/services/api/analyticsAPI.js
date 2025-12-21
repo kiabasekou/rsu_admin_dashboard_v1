@@ -45,7 +45,12 @@ export const analyticsAPI = {
       params: { period }
     });
   },
-
+  /**
+   * Récupérer rapports disponibles
+   */
+  getReports: async () => {
+    return await apiClient.get('/analytics/data-exports/');
+  },
   // ==================== DASHBOARD CONFIGS ====================
 
   /**
