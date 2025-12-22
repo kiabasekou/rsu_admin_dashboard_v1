@@ -14,7 +14,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart3, Users, TrendingUp, RefreshCw, 
-  FileText, Settings, LogOut, Network
+  FileText, Settings, LogOut, Network, Activity
 } from 'lucide-react';
 
 // Hooks
@@ -28,6 +28,7 @@ import ProgramsTab from '../components/Dashboard/ProgramsTab';
 import AnalyticsTab from '../components/Dashboard/AnalyticsTab';
 import DeduplicationTab from '../components/Dashboard/DeduplicationTab';
 import FamilyGraphTab from '../components/Dashboard/FamilyGraphTab';
+import ServicesTab from '../components/Dashboard/ServicesTab';
 
 // Services
 import apiClient from '../services/api/apiClient';
@@ -132,8 +133,13 @@ export default function Dashboard() {
       case 'deduplication':
         return <DeduplicationTab />;
       
+     
+      case 'services':
+        return <ServicesTab />;
+
       case 'family-graph':
         return <FamilyGraphTab />;
+      
       
       default:
         return (
@@ -152,6 +158,7 @@ export default function Dashboard() {
       overview: BarChart3,
       beneficiaries: Users,
       programs: FileText,
+      services: Activity,        // NOUVEAU
       analytics: TrendingUp,
       deduplication: Settings,
       'family-graph': Network
@@ -166,6 +173,7 @@ export default function Dashboard() {
       overview: 'Vue d\'ensemble',
       beneficiaries: 'Bénéficiaires',
       programs: 'Programmes',
+      services: 'Services',        // NOUVEAU
       analytics: 'Analytics',
       deduplication: 'Déduplication',
       'family-graph': 'Réseau Familial'
@@ -248,7 +256,8 @@ export default function Dashboard() {
 
           {/* Tabs Navigation */}
           <div className="flex space-x-1 -mb-px">
-            {['overview', 'beneficiaries', 'programs', 'analytics', 'deduplication', 'family-graph'].map((tab) => (
+          
+            {['overview', 'beneficiaries', 'programs', 'services', 'analytics', 'deduplication', 'family-graph'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}

@@ -1,0 +1,501 @@
+/**
+ * 🇬🇦 RSU Gabon - Eligibility & Services Styles
+ * Standards Top 1% - Design System Cohérent
+ * Fichier: rsu_admin_dashboard_v1/src/styles/eligibility.css
+ */
+
+/* ==================== ELIGIBILITY CHECKER ==================== */
+
+.eligibility-checker {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.checker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.checker-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.placeholder {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 2px dashed #e5e7eb;
+}
+
+/* ==================== ELIGIBILITY RESULTS ==================== */
+
+.eligibility-results {
+  margin-top: 24px;
+}
+
+.results-header {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  border-radius: 8px;
+}
+
+.score-card {
+  text-align: center;
+  padding: 20px;
+  border: 3px solid;
+  border-radius: 12px;
+  background: white;
+  min-width: 140px;
+}
+
+.score-value {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.score-label {
+  font-size: 14px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-badge,
+.priority-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+}
+
+.program-info {
+  margin-bottom: 20px;
+}
+
+.program-info h4 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.program-code {
+  display: inline-block;
+  background: #f3f4f6;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+}
+
+.criteria-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+
+.criteria-section.success {
+  background: #f0fdf4;
+  border-color: #10b981;
+}
+
+.criteria-section.warning {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.criteria-section h5 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.criteria-section ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.criteria-section li {
+  margin-bottom: 6px;
+  color: #374151;
+  position: relative;
+  padding-left: 20px;
+}
+
+.criteria-section.success li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+}
+
+.criteria-section.warning li::before {
+  content: '×';
+  position: absolute;
+  left: 0;
+  color: #f59e0b;
+  font-weight: bold;
+}
+
+.recommendation-notes {
+  background: #eff6ff;
+  padding: 16px;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+  margin-bottom: 20px;
+}
+
+.recommendation-notes h5 {
+  margin: 0 0 8px 0;
+  color: #1e40af;
+}
+
+.recommendation-notes p {
+  margin: 0;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.person-summary {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.rsu-id {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.assessment-meta {
+  text-align: right;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ==================== RECOMMENDED PROGRAMS ==================== */
+
+.recommended-programs {
+  margin-top: 24px;
+}
+
+.recommended-programs h4 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.programs-list {
+  display: grid;
+  gap: 16px;
+}
+
+.program-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.program-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.program-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.program-header h5 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.program-score {
+  position: relative;
+  height: 24px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.score-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 12px;
+}
+
+.score-value {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.blocking-factors {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fef3c7;
+  border-radius: 6px;
+}
+
+.blocking-factors small {
+  display: block;
+  margin-bottom: 6px;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.blocking-factors ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #78350f;
+}
+
+/* ==================== VULNERABILITY DISPLAY ==================== */
+
+.vulnerability-display {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.vulnerability-header {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.score-circle {
+  width: 140px;
+  height: 140px;
+  border: 6px solid;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.score-circle .score-value {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-max {
+  font-size: 16px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.risk-info h4 {
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.dimensions-section {
+  margin-bottom: 24px;
+}
+
+.dimensions-section h5 {
+  margin: 0 0 16px 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dimensions-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.dimension-item {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.dimension-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.dimension-bar {
+  height: 20px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dimension-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 10px;
+}
+
+.dimension-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 50px;
+  text-align: right;
+}
+
+.needs-section,
+.interventions-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.interventions-section.priority {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+}
+
+.needs-section h5,
+.interventions-section h5 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.needs-section ul,
+.interventions-section ul {
+  margin: 0;
+  padding-left: 24px;
+  color: #374151;
+}
+
+.needs-section li,
+.interventions-section li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+/* ==================== COMMON ==================== */
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
