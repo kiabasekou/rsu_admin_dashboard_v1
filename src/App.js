@@ -8,6 +8,8 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import './styles/eligibility.css';
+import './styles/services.css';  // ← Ajouter cette ligne
 
 // ============================================================================
 // LAZY LOADING DES PAGES

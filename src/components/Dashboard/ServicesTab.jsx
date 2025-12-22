@@ -1,11 +1,13 @@
 /**
- * 🇬🇦 RSU Gabon - Services Tab
- * Standards Top 1% - Éligibilité & Vulnérabilité
+ * 🇬🇦 RSU Gabon - Services Tab UPDATED
+ * Standards Top 1% - UX Améliorée avec Search Components
  * Fichier: rsu_admin_dashboard_v1/src/components/Dashboard/ServicesTab.jsx
  */
 
 import React, { useState } from 'react';
 import { Activity, Target, AlertTriangle, TrendingUp } from 'lucide-react';
+import PersonSearch from '../common/PersonSearch';
+import ProgramSelector from '../common/ProgramSelector';
 import EligibilityChecker from '../../pages/Programs/EligibilityChecker';
 import RecommendedPrograms from '../../pages/Programs/RecommendedPrograms';
 import VulnerabilityDisplay from '../../pages/Services/VulnerabilityDisplay';
@@ -13,17 +15,17 @@ import servicesAPI from '../../services/api/servicesAPI';
 
 export default function ServicesTab() {
   const [activeView, setActiveView] = useState('eligibility');
-  const [selectedPersonId, setSelectedPersonId] = useState(null);
-  const [selectedProgramCode, setSelectedProgramCode] = useState(null);
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
   const [vulnerabilityData, setVulnerabilityData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleCalculateVulnerability = async () => {
-    if (!selectedPersonId) return;
+    if (!selectedPerson) return;
 
     setLoading(true);
     try {
-      const response = await servicesAPI.calculateVulnerability(selectedPersonId);
+      const response = await servicesAPI.calculateVulnerability(selectedPerson.id);
       setVulnerabilityData(response);
     } catch (error) {
       console.error('Error calculating vulnerability:', error);
@@ -73,57 +75,63 @@ export default function ServicesTab() {
 
       {/* Person Selection (Common) */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Sélection Bénéficiaire</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              ID Personne
-            </label>
-            <input
-              type="number"
-              value={selectedPersonId || ''}
-              onChange={(e) => setSelectedPersonId(e.target.value ? parseInt(e.target.value) : null)}
-              placeholder="Entrer ID personne..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {activeView === 'eligibility' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Code Programme
-              </label>
-              <input
-                type="text"
-                value={selectedProgramCode || ''}
-                onChange={(e) => setSelectedProgramCode(e.target.value || null)}
-                placeholder="Ex: AUF-2024"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          )}
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          1️⃣ Sélection Bénéficiaire
+        </h3>
+        <PersonSearch 
+          onSelect={setSelectedPerson}
+          selectedPerson={selectedPerson}
+        />
       </div>
+
+      {/* Program Selection (Only for Eligibility) */}
+      {activeView === 'eligibility' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            2️⃣ Sélection Programme
+          </h3>
+          <ProgramSelector
+            onSelect={setSelectedProgram}
+            selectedProgram={selectedProgram}
+          />
+        </div>
+      )}
 
       {/* Content */}
       <div className="bg-white rounded-lg shadow p-6">
-        {activeView === 'eligibility' && (
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          {activeView === 'eligibility' && '3️⃣ Résultat Éligibilité'}
+          {activeView === 'recommended' && '2️⃣ Programmes Recommandés'}
+          {activeView === 'vulnerability' && '2️⃣ Évaluation Vulnérabilité'}
+        </h3>
+
+        {activeView === 'eligibility' && selectedPerson && selectedProgram && (
           <EligibilityChecker 
-            personId={selectedPersonId}
-            programCode={selectedProgramCode}
+            personId={selectedPerson.id}
+            programCode={selectedProgram.code}
           />
         )}
 
-        {activeView === 'recommended' && selectedPersonId && (
+        {activeView === 'eligibility' && (!selectedPerson || !selectedProgram) && (
+          <div className="text-center py-12 text-gray-500">
+            <Target className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <p className="text-lg font-medium">Sélectionnez un bénéficiaire et un programme</p>
+            <p className="text-sm">pour calculer l'éligibilité</p>
+          </div>
+        )}
+
+        {activeView === 'recommended' && selectedPerson && (
           <RecommendedPrograms 
-            personId={selectedPersonId}
+            personId={selectedPerson.id}
             minScore={60.0}
           />
         )}
 
-        {activeView === 'recommended' && !selectedPersonId && (
+        {activeView === 'recommended' && !selectedPerson && (
           <div className="text-center py-12 text-gray-500">
-            Sélectionnez un bénéficiaire pour voir les programmes recommandés
+            <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <p className="text-lg font-medium">Sélectionnez un bénéficiaire</p>
+            <p className="text-sm">pour voir les programmes recommandés</p>
           </div>
         )}
 
@@ -131,7 +139,7 @@ export default function ServicesTab() {
           <div>
             <button
               onClick={handleCalculateVulnerability}
-              disabled={!selectedPersonId || loading}
+              disabled={!selectedPerson || loading}
               className="mb-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (
@@ -151,9 +159,17 @@ export default function ServicesTab() {
               <VulnerabilityDisplay assessment={vulnerabilityData} />
             )}
 
-            {!vulnerabilityData && !loading && (
+            {!vulnerabilityData && !loading && !selectedPerson && (
               <div className="text-center py-12 text-gray-500">
-                Cliquez sur "Calculer Vulnérabilité" pour évaluer le bénéficiaire
+                <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg font-medium">Sélectionnez un bénéficiaire</p>
+                <p className="text-sm">pour calculer la vulnérabilité</p>
+              </div>
+            )}
+
+            {!vulnerabilityData && !loading && selectedPerson && (
+              <div className="text-center py-12 text-gray-500">
+                <p>Cliquez sur "Calculer Vulnérabilité" pour évaluer le bénéficiaire</p>
               </div>
             )}
           </div>
@@ -164,6 +180,8 @@ export default function ServicesTab() {
       <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
         <p className="font-semibold text-blue-800 mb-1">📡 Endpoints utilisés:</p>
         <ul className="text-blue-700 text-sm space-y-1">
+          <li>✅ GET /api/v1/identity/persons/ (search)</li>
+          <li>✅ GET /api/v1/programs/programs/ (active)</li>
           {activeView === 'eligibility' && (
             <li>✅ POST /api/v1/services/program-eligibility/calculate_eligibility/</li>
           )}

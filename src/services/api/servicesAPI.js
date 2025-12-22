@@ -1,9 +1,12 @@
 /**
- * 🇬🇦 RSU Gabon - Services API
- * Standards Top 1% - Moteurs Vulnérabilité, Éligibilité, Géotargeting
+ * 🇬🇦 RSU Gabon - Services API CORRIGÉ
+ * Standards Top 1% - Endpoints VÉRIFIÉS depuis urls.py
  * Fichier: rsu_admin_dashboard_v1/src/services/api/servicesAPI.js
  * 
- * SOURCE VÉRITÉ: apps/services_app/views/*.py
+ * SOURCE VÉRITÉ: apps/services_app/urls.py
+ * router.register(r'eligibility', ...)
+ * router.register(r'vulnerability-assessments', ...)
+ * router.register(r'social-programs', ...)
  */
 
 import apiClient from './apiClient';
@@ -44,10 +47,12 @@ export const servicesAPI = {
   
   /**
    * Calculer éligibilité personne/programme
-   * POST /api/v1/services/program-eligibility/calculate_eligibility/
+   * POST /api/v1/services/eligibility/calculate_eligibility/
+   * 
+   * ATTENTION: Le router enregistre 'eligibility', pas 'program-eligibility'
    */
   calculateEligibility: async (personId, programCode) => {
-    return await apiClient.post('/services/program-eligibility/calculate_eligibility/', {
+    return await apiClient.post('/services/eligibility/calculate_eligibility/', {
       person_id: personId,
       program_code: programCode
     });
@@ -55,10 +60,10 @@ export const servicesAPI = {
 
   /**
    * Programmes recommandés pour une personne
-   * GET /api/v1/services/program-eligibility/recommended_programs/
+   * GET /api/v1/services/eligibility/recommended_programs/
    */
   getRecommendedPrograms: async (personId, minScore = 60.0) => {
-    return await apiClient.get('/services/program-eligibility/recommended_programs/', {
+    return await apiClient.get('/services/eligibility/recommended_programs/', {
       params: {
         person_id: personId,
         min_score: minScore
@@ -68,10 +73,10 @@ export const servicesAPI = {
 
   /**
    * Liste éligibilités
-   * GET /api/v1/services/program-eligibility/
+   * GET /api/v1/services/eligibility/
    */
   getEligibilityList: async (filters = {}) => {
-    return await apiClient.get('/services/program-eligibility/', {
+    return await apiClient.get('/services/eligibility/', {
       params: filters
     });
   },

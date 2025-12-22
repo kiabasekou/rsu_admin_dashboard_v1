@@ -52,7 +52,7 @@ export default function EligibilityResults({ data }) {
     return badges[priority] || { label: `Priorité ${priority}`, color: '#6b7280' };
   };
 
-  const scoreColor = getScoreColor(data.eligibility_score);
+  const scoreColor = parseFloat(data.eligibility_score);
   const priorityBadge = getPriorityBadge(data.priority_ranking);
 
   return (
@@ -61,9 +61,10 @@ export default function EligibilityResults({ data }) {
       <div className="results-header">
         <div className="score-card" style={{ borderColor: scoreColor }}>
           <div className="score-value" style={{ color: scoreColor }}>
-            {data.eligibility_score?.toFixed(1) || '0.0'}
+            {parseFloat(data.eligibility_score).toFixed(1)}%  {/* ✅ Convertit en number */}
           </div>
           <div className="score-label">Score d'Éligibilité</div>
+          
         </div>
 
         <div className="status-info">

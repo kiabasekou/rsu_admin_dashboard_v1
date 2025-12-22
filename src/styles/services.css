@@ -1,0 +1,270 @@
+/**
+ * 🇬🇦 RSU Gabon - Services Components Styles
+ * Fichier: rsu_admin_dashboard_v1/src/styles/services.css
+ */
+
+/* ==================== PERSON SEARCH ==================== */
+
+.person-search {
+  width: 100%;
+}
+
+.selected-person {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #eff6ff;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+}
+
+.person-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.clear-btn {
+  padding: 6px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 44px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.spinner-small {
+  position: absolute;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.results-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.result-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.result-item:hover {
+  background: #f3f4f6;
+}
+
+.result-item:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.result-info {
+  flex: 1;
+}
+
+.result-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.result-meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.no-results {
+  padding: 16px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* ==================== PROGRAM SELECTOR ==================== */
+
+.program-selector {
+  width: 100%;
+}
+
+.program-selector.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.program-card {
+  position: relative;
+  padding: 16px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.program-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.program-card.selected {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.program-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.program-code {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.program-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  min-height: 42px;
+}
+
+.program-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.stat-item svg {
+  color: #9ca3af;
+}
+
+.selected-indicator {
+  margin-top: 12px;
+  padding: 8px;
+  background: #3b82f6;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .result-meta {
+    font-size: 11px;
+  }
+}
