@@ -1,20 +1,6 @@
 /**
- * 🇬🇦 RSU Gabon - Eligibility Results Component
- * Standards Top 1% - Affichage Résultats Éligibilité
- * Fichier: rsu_admin_dashboard_v1/src/pages/Programs/EligibilityResults.jsx
- * 
- * STRUCTURE BACKEND (apps/services_app/models.py):
- * {
- *   person: {...},
- *   program_code: "AUF-2024",
- *   program_name: "Allocation Universelle Familiale",
- *   eligibility_status: "ELIGIBLE",
- *   eligibility_score: 85.50,
- *   matching_criteria: [...],
- *   missing_criteria: [...],
- *   priority_ranking: 1,
- *   recommendation_notes: "..."
- * }
+ * 🇬🇦 RSU Gabon - Eligibility Results Component FIXED
+ * Standards Top 1% - Aligné sur API Response Réelle
  */
 
 import React from 'react';
@@ -22,123 +8,134 @@ import React from 'react';
 export default function EligibilityResults({ data }) {
   if (!data) return null;
 
-  // Helper: Score color
-  const getScoreColor = (score) => {
-    if (score >= 80) return '#10b981'; // Vert
-    if (score >= 50) return '#f59e0b'; // Orange
-    return '#ef4444';                   // Rouge
+  // ✅ CORRECTION 1: Utiliser les vrais noms de champs de l'API
+  const score = parseFloat(data.eligibility_score) || 0;
+  const priority = parseInt(data.processing_priority, 10) || 99;  // ✅ processing_priority, pas priority_ranking
+
+  // 2. Helpers de style (Design System RSU)
+  const getScoreColor = (val) => {
+    if (val >= 80) return '#10b981'; // Success (Vert Emerald)
+    if (val >= 50) return '#f59e0b'; // Warning (Orange)
+    return '#ef4444';                // Danger (Rouge)
   };
 
-  // Helper: Status label
   const getStatusLabel = (status) => {
     const labels = {
-      'ELIGIBLE': 'Éligible',
-      'NOT_ELIGIBLE': 'Non Éligible',
-      'PENDING': 'En Attente',
-      'CONDITIONALLY_ELIGIBLE': 'Conditionnellement Éligible'
+      'HIGHLY_RECOMMENDED': 'Fortement Recommandé',
+      'RECOMMENDED': 'Recommandé',
+      'CONDITIONALLY_ELIGIBLE': 'Éligible sous conditions',
+      'NOT_ELIGIBLE': 'Non Éligible'
     };
     return labels[status] || status;
   };
 
-  // Helper: Priority badge
-  const getPriorityBadge = (priority) => {
+  const getPriorityBadge = (prio) => {
     const badges = {
-      1: { label: 'Priorité 1', color: '#dc2626' },
-      2: { label: 'Priorité 2', color: '#ea580c' },
-      3: { label: 'Priorité 3', color: '#f59e0b' },
-      4: { label: 'Priorité 4', color: '#84cc16' },
-      5: { label: 'Priorité 5', color: '#22c55e' }
+      1: { label: 'Priorité Critique (1)', color: '#7f1d1d' },
+      2: { label: 'Haute Priorité (2)', color: '#9a3412' },
+      3: { label: 'Priorité Normale (3)', color: '#92400e' },
+      4: { label: 'Priorité Basse (4)', color: '#3f6212' },
+      5: { label: 'Suivi Standard (5)', color: '#166534' }
     };
-    return badges[priority] || { label: `Priorité ${priority}`, color: '#6b7280' };
+    return badges[prio] || { label: `Priorité ${prio}`, color: '#374151' };
   };
 
-  const scoreColor = parseFloat(data.eligibility_score);
-  const priorityBadge = getPriorityBadge(data.priority_ranking);
+  const dynamicColor = getScoreColor(score);
+  const priorityInfo = getPriorityBadge(priority);
 
   return (
-    <div className="eligibility-results">
-      {/* Header avec Score */}
-      <div className="results-header">
-        <div className="score-card" style={{ borderColor: scoreColor }}>
-          <div className="score-value" style={{ color: scoreColor }}>
-            {parseFloat(data.eligibility_score).toFixed(1)}%  {/* ✅ Convertit en number */}
+    <div className="eligibility-results" style={{ borderLeft: `5px solid ${dynamicColor}`, padding: '20px', backgroundColor: '#fff', borderRadius: '8px', marginTop: '20px' }}>
+      
+      {/* Header avec Visualisation du Score */}
+      <div className="results-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="score-card" style={{ 
+          border: `2px solid ${dynamicColor}`, 
+          padding: '15px', 
+          borderRadius: '12px',
+          textAlign: 'center',
+          backgroundColor: `${dynamicColor}08` // 8% d'opacité
+        }}>
+          <div className="score-value" style={{ color: dynamicColor, fontSize: '2rem', fontWeight: '800' }}>
+            {score.toFixed(1)}%
           </div>
-          <div className="score-label">Score d'Éligibilité</div>
-          
+          <div className="score-label" style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Score d'Éligibilité
+          </div>
         </div>
 
-        <div className="status-info">
-          <span 
+        <div className="status-info" style={{ textAlign: 'right' }}>
+          <div 
             className="status-badge" 
-            style={{ backgroundColor: scoreColor }}
+            style={{ 
+              backgroundColor: dynamicColor, 
+              color: 'white', 
+              padding: '6px 16px', 
+              borderRadius: '20px', 
+              fontWeight: 'bold',
+              display: 'inline-block',
+              marginBottom: '8px'
+            }}
           >
-            {getStatusLabel(data.eligibility_status)}
-          </span>
+            {getStatusLabel(data.recommendation_level)}
+          </div>
+          <br />
           <span 
             className="priority-badge"
-            style={{ backgroundColor: priorityBadge.color }}
+            style={{ 
+              backgroundColor: priorityInfo.color, 
+              color: 'white', 
+              padding: '4px 12px', 
+              borderRadius: '4px', 
+              fontSize: '0.75rem' 
+            }}
           >
-            {priorityBadge.label}
+            {priorityInfo.label}
           </span>
         </div>
       </div>
 
-      {/* Programme Info */}
-      <div className="program-info">
-        <h4>{data.program_name}</h4>
-        <span className="program-code">{data.program_code}</span>
+      {/* Détails du Programme */}
+      <div className="program-info" style={{ marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+        <h4 style={{ margin: 0, color: '#1f2937' }}>{data.program_name || 'Programme'}</h4>
+        <code style={{ color: '#6b7280' }}>{data.program_code}</code>
       </div>
 
-      {/* Matching Criteria */}
-      {data.matching_criteria && data.matching_criteria.length > 0 && (
-        <div className="criteria-section success">
-          <h5>✅ Critères Satisfaits</h5>
-          <ul>
-            {data.matching_criteria.map((criterion, i) => (
-              <li key={i}>{criterion}</li>
-            ))}
-          </ul>
+      {/* Section Critères (Grid pour plus de clarté) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        {/* Facteurs d'Éligibilité (Points Forts) */}
+        {data.eligibility_factors?.length > 0 && (
+          <div className="criteria-section success" style={{ backgroundColor: '#f0fdf4', padding: '12px', borderRadius: '8px' }}>
+            <h5 style={{ color: '#166534', marginTop: 0 }}>✅ Facteurs Favorables</h5>
+            <ul style={{ fontSize: '0.9rem', color: '#166534', paddingLeft: '20px' }}>
+              {data.eligibility_factors.map((c, i) => <li key={i}>{c}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {/* Facteurs Bloquants */}
+        {data.blocking_factors?.length > 0 && (
+          <div className="criteria-section warning" style={{ backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px' }}>
+            <h5 style={{ color: '#991b1b', marginTop: 0 }}>⚠️ Facteurs Bloquants</h5>
+            <ul style={{ fontSize: '0.9rem', color: '#991b1b', paddingLeft: '20px' }}>
+              {data.blocking_factors.map((c, i) => <li key={i}>{c}</li>)}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Notes d'Évaluation */}
+      {data.assessment_notes && (
+        <div className="recommendation-notes" style={{ marginTop: '20px', fontStyle: 'italic', color: '#4b5563', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+          <strong>Notes d'Évaluation :</strong>
+          <p>{data.assessment_notes}</p>
         </div>
       )}
 
-      {/* Missing Criteria */}
-      {data.missing_criteria && data.missing_criteria.length > 0 && (
-        <div className="criteria-section warning">
-          <h5>❌ Critères Manquants</h5>
-          <ul>
-            {data.missing_criteria.map((criterion, i) => (
-              <li key={i}>{criterion}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Recommendation Notes */}
-      {data.recommendation_notes && (
-        <div className="recommendation-notes">
-          <h5>📝 Recommandations</h5>
-          <p>{data.recommendation_notes}</p>
-        </div>
-      )}
-
-      {/* Person Info */}
-      {data.person && (
-        <div className="person-summary">
-          <strong>Bénéficiaire:</strong> {data.person_name || data.person.full_name}
-          {data.person_rsu_id && (
-            <span className="rsu-id"> (ID: {data.person_rsu_id})</span>
-          )}
-        </div>
-      )}
-
-      {/* Assessment Date */}
-      {data.assessment_date && (
-        <div className="assessment-meta">
-          <small>
-            Évalué le: {new Date(data.assessment_date).toLocaleDateString('fr-GA')}
-          </small>
-        </div>
-      )}
+      {/* Footer Meta */}
+      <div className="assessment-meta" style={{ marginTop: '30px', display: 'flex', justifyContent: 'space-between', color: '#9ca3af', fontSize: '0.75rem' }}>
+        <span>Bénéficiaire : {data.person_name || 'N/A'} ({data.person_rsu_id || 'N/A'})</span>
+        <span>Évaluation du {data.assessment_date ? new Date(data.assessment_date).toLocaleDateString('fr-GA') : 'Date inconnue'}</span>
+      </div>
     </div>
   );
 }
