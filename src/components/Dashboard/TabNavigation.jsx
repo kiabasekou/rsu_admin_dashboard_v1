@@ -1,7 +1,11 @@
+
 /**
- * 🇬🇦 RSU Gabon - Tab Navigation ENRICHIE
- * Standards Top 1% - Navigation avec Analytics & Deduplication
+ * 🇬🇦 RSU Gabon - Tab Navigation CORRIGÉE
+ * Standards Top 1% - Navigation complète avec Services + Family Graph
  * Fichier: rsu_admin_dashboard_v1/src/components/Dashboard/TabNavigation.jsx
+ * 
+ * ✅ CORRECTION: Ajout onglet Services manquant
+ * ✅ AMÉLIORATION: Ajout onglet Family Graph
  */
 
 import React from 'react';
@@ -9,9 +13,10 @@ import {
   LayoutDashboard,
   Users,
   Target,
+  Activity,        // Services icon
   TrendingUp,
   UserX,
-  Bell
+  Network          // Family Graph icon
 } from 'lucide-react';
 
 const TABS = [
@@ -34,18 +39,31 @@ const TABS = [
     description: 'Programmes sociaux'
   },
   {
+    id: 'services',              // ✅ AJOUTÉ
+    label: 'Services',
+    icon: Activity,
+    description: 'Éligibilité & Vulnérabilité'
+  },
+  {
     id: 'analytics',
     label: 'Analytics IA',
     icon: TrendingUp,
     description: 'KPIs & Rapports avancés',
-    badge: 'AI' // Nouveau badge
+    badge: 'AI'
   },
   {
     id: 'deduplication',
     label: 'Doublons',
     icon: UserX,
     description: 'Détection anti-fraude',
-    badge: 'AI' // Nouveau badge
+    badge: 'AI'
+  },
+  {
+    id: 'family-graph',          // ✅ AJOUTÉ
+    label: 'Réseau Familial',
+    icon: Network,
+    description: 'Relations & Dépendances',
+    badge: 'NEW'
   }
 ];
 
@@ -75,7 +93,13 @@ export default function TabNavigation({ activeTab, onTabChange }) {
                 <div className="flex items-center gap-2">
                   <span>{tab.label}</span>
                   {tab.badge && (
-                    <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[10px] font-bold rounded">
+                    <span className={`
+                      px-1.5 py-0.5 text-white text-[10px] font-bold rounded
+                      ${tab.badge === 'AI' 
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-600'
+                        : 'bg-green-500'
+                      }
+                    `}>
                       {tab.badge}
                     </span>
                   )}

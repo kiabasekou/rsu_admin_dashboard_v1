@@ -1,20 +1,17 @@
 /**
- * 🇬🇦 RSU GABON - DASHBOARD FINAL AVEC FAMILY GRAPH
- * Standards Top 1% - Navigation complète 6 onglets
+ * 🇬🇦 RSU GABON - DASHBOARD FINAL CORRIGÉ
+ * Standards Top 1% - Navigation avec TabNavigation component
  * 
- * FEATURES:
- * ✅ Analytics Tab (KPIs + Rapports)
- * ✅ Deduplication Tab (ML + Fusions)
- * ✅ Family Graph Tab (Relations + Réseaux) - NOUVEAU
+ * ✅ CORRECTION: Utilisation correcte de TabNavigation
+ * ✅ FIX: Suppression de la navigation manuelle dupliquée
  * 
- * Fichier: src/pages/Dashboard.jsx - VERSION FINALE
+ * Fichier: src/pages/Dashboard.jsx - VERSION CORRIGÉE
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  BarChart3, Users, TrendingUp, RefreshCw, 
-  FileText, Settings, LogOut, Network, Activity
+  BarChart3, RefreshCw, LogOut
 } from 'lucide-react';
 
 // Hooks
@@ -27,6 +24,7 @@ import BeneficiariesTab from '../components/Dashboard/BeneficiariesTab';
 import ProgramsTab from '../components/Dashboard/ProgramsTab';
 import AnalyticsTab from '../components/Dashboard/AnalyticsTab';
 import DeduplicationTab from '../components/Dashboard/DeduplicationTab';
+import TabNavigation from '../components/Dashboard/TabNavigation';
 import FamilyGraphTab from '../components/Dashboard/FamilyGraphTab';
 import ServicesTab from '../components/Dashboard/ServicesTab';
 
@@ -127,19 +125,17 @@ export default function Dashboard() {
       case 'programs':
         return <ProgramsTab />;
       
+      case 'services':
+        return <ServicesTab />;
+      
       case 'analytics':
         return <AnalyticsTab />;
       
       case 'deduplication':
         return <DeduplicationTab />;
-      
-     
-      case 'services':
-        return <ServicesTab />;
 
       case 'family-graph':
         return <FamilyGraphTab />;
-      
       
       default:
         return (
@@ -151,35 +147,6 @@ export default function Dashboard() {
           />
         );
     }
-  };
-
-  const getTabIcon = (tab) => {
-    const icons = {
-      overview: BarChart3,
-      beneficiaries: Users,
-      programs: FileText,
-      services: Activity,        // NOUVEAU
-      analytics: TrendingUp,
-      deduplication: Settings,
-      'family-graph': Network
-    };
-    
-    const Icon = icons[tab] || BarChart3;
-    return <Icon className="w-5 h-5" />;
-  };
-
-  const getTabLabel = (tab) => {
-    const labels = {
-      overview: 'Vue d\'ensemble',
-      beneficiaries: 'Bénéficiaires',
-      programs: 'Programmes',
-      services: 'Services',        // NOUVEAU
-      analytics: 'Analytics',
-      deduplication: 'Déduplication',
-      'family-graph': 'Réseau Familial'
-    };
-    
-    return labels[tab] || tab;
   };
 
   // ========== LOADING STATE ==========
@@ -253,42 +220,6 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
-
-          {/* Tabs Navigation */}
-          <div className="flex space-x-1 -mb-px">
-          
-            {['overview', 'beneficiaries', 'programs', 'services', 'analytics', 'deduplication', 'family-graph'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`
-                  flex items-center space-x-2 px-4 py-3 font-medium text-sm
-                  border-b-2 transition-all duration-200
-                  ${activeTab === tab
-                    ? 'bg-white text-blue-600 border-blue-600 -mb-px'
-                    : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'
-                  }
-                `}
-              >
-                {getTabIcon(tab)}
-                <span>{getTabLabel(tab)}</span>
-                
-                {/* Badge AI pour Analytics & Deduplication */}
-                {(tab === 'analytics' || tab === 'deduplication') && (
-                  <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[10px] font-bold rounded">
-                    AI
-                  </span>
-                )}
-                
-                {/* Badge NEW pour Family Graph */}
-                {tab === 'family-graph' && (
-                  <span className="px-1.5 py-0.5 bg-green-600 text-white text-[10px] font-bold rounded">
-                    NEW
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
         </div>
       </header>
 
@@ -308,6 +239,14 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Tab Navigation Component */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <TabNavigation 
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
