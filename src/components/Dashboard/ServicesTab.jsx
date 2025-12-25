@@ -16,7 +16,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { servicesAPI } from '../../services/api/servicesAPI';
+import servicesAPI from '../../services/api/servicesAPI';
 
 // ... (imports et autres méthodes)
 

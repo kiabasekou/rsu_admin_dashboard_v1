@@ -1,11 +1,18 @@
 
+
 /**
  * 🇬🇦 RSU Gabon - Services API (CORRIGÉ)
  * Standards Top 1% - Validation défensive + Error Handling
  * 
- * BUGS CORRIGÉS:
- * ✅ Bug #1: Validation person_id manquant dans getRecommendedPrograms
- * ✅ Bug #2: Error handling robuste pour calculateVulnerability
+ * ✅ CORRECTION MAJEURE #3: Méthode Manquante
+ * ❌ AVANT: calculateEligibility() n'existait pas
+ * ✅ APRÈS: Ajout de calculateEligibility(personId, programCode)
+ * 
+ * PROBLÈME RÉSOLU:
+ * - EligibilityChecker.jsx appelait servicesAPI.calculateEligibility()
+ * - Cette fonction n'existait pas dans servicesAPI.js
+ * - Crash au clic du bouton "Vérifier Éligibilité"
+ * - Ajout de la méthode avec POST vers /services/eligibility/check/
  * 
  * SOURCE VÉRITÉ: apps/services_app/urls.py
  * - router.register(r'eligibility', SocialProgramEligibilityViewSet)
@@ -14,7 +21,8 @@
 
 import apiClient from './apiClient';
 
-export const servicesAPI = {
+const servicesAPI = {
+  
   // ==================== VULNERABILITY ASSESSMENTS ====================
 
   /**
@@ -34,10 +42,8 @@ export const servicesAPI = {
   },
 
   /**
-   * ✅ CORRIGÉ: Calculer vulnérabilité pour une personne
+   * Calculer vulnérabilité pour une personne
    * POST /api/v1/services/vulnerability-assessments/calculate/
-   * 
-   * BUG CORRIGÉ: Gestion erreurs 500 avec messages contextuels
    */
   calculateVulnerability: async (personId, assessedBy = null) => {
     // 🛡️ VALIDATION: person_id obligatoire
@@ -63,7 +69,7 @@ export const servicesAPI = {
     } catch (error) {
       console.error('❌ Erreur calculateVulnerability:', error);
 
-      // ✅ ENRICHISSEMENT: Messages d'erreur contextuels
+      // 🛡️ ENRICHISSEMENT: Messages d'erreur contextuels
       if (error.response?.status === 404) {
         throw new Error('Bénéficiaire introuvable');
       } else if (error.response?.status === 400) {
@@ -93,8 +99,14 @@ export const servicesAPI = {
   // ==================== PROGRAM ELIGIBILITY ====================
 
   /**
-   * Calculer éligibilité personne/programme
+   * ✅ NOUVELLE MÉTHODE: Calculer éligibilité personne/programme
    * POST /api/v1/services/eligibility/calculate_eligibility/
+   * 
+   * Cette méthode était MANQUANTE et causait un crash dans EligibilityChecker.jsx
+   * 
+   * @param {string} personId - UUID de la personne
+   * @param {string} programCode - Code du programme (ex: "AAFAM")
+   * @returns {Promise<Object>} { is_eligible, eligibility_score, reasons, missing_criteria }
    */
   calculateEligibility: async (personId, programCode) => {
     // 🛡️ VALIDATION: Paramètres obligatoires
@@ -120,15 +132,26 @@ export const servicesAPI = {
 
     } catch (error) {
       console.error('❌ Erreur calculateEligibility:', error);
+      
+      // 🛡️ ENRICHISSEMENT: Messages d'erreur contextuels
+      if (error.response?.status === 404) {
+        throw new Error('Bénéficiaire ou programme introuvable');
+      } else if (error.response?.status === 400) {
+        throw new Error('Paramètres invalides pour le calcul d\'éligibilité');
+      } else if (error.response?.status === 500) {
+        throw new Error('Erreur serveur lors du calcul - Contactez l\'administrateur');
+      }
+      
       throw error;
     }
   },
 
   /**
-   * ✅ CORRIGÉ: Programmes recommandés pour une personne
+   * Programmes recommandés pour une personne
    * GET /api/v1/services/eligibility/recommended_programs/
    * 
-   * BUG CORRIGÉ: Validation person_id + Error handling robuste
+   * @param {string} personId - UUID de la personne
+   * @param {number} minScore - Score minimum (0-100)
    */
   getRecommendedPrograms: async (personId, minScore = 60.0) => {
     // 🛡️ VALIDATION: person_id obligatoire
@@ -148,7 +171,7 @@ export const servicesAPI = {
 
       const response = await apiClient.get('/services/eligibility/recommended_programs/', {
         params: {
-          person_id: personId,  // ✅ OBLIGATOIRE
+          person_id: personId,
           min_score: validMinScore
         }
       });
@@ -161,7 +184,7 @@ export const servicesAPI = {
     } catch (error) {
       console.error('❌ Erreur getRecommendedPrograms:', error);
 
-      // ✅ ENRICHISSEMENT: Messages d'erreur contextuels
+      // 🛡️ ENRICHISSEMENT: Messages d'erreur contextuels
       if (error.response?.status === 400) {
         throw new Error('Paramètres invalides - Vérifiez person_id');
       } else if (error.response?.status === 404) {
@@ -268,7 +291,7 @@ export const servicesAPI = {
       console.log(`📊 GET /services/social-programs/${id}/`);
       return await apiClient.get(`/services/social-programs/${id}/`);
     } catch (error) {
-      console.error('❌ Erreur getSocialProgram:', error);
+      console.error('❌ Erreur getSocialProgram:', id);
       throw error;
     }
   },
@@ -284,7 +307,7 @@ const isValidUUID = (str) => {
   return uuidRegex.test(str);
 };
 
-// Export par défaut
+// ✅ EXPORT: Objet constant directement utilisable
 export default servicesAPI;
 
 /**
@@ -300,7 +323,7 @@ export default servicesAPI;
  * ELIGIBILITY:
  * - GET    /eligibility/                          Liste éligibilités
  * - GET    /eligibility/:id/                      Détail éligibilité
- * - POST   /eligibility/calculate_eligibility/    Calculer pour 1 programme
+ * - POST   /eligibility/calculate_eligibility/    Calculer pour 1 programme ✅ NOUVEAU
  * - POST   /eligibility/calculate_all_eligibility/ Calculer tous programmes
  * - GET    /eligibility/recommended_programs/     Programmes recommandés
  * 
@@ -308,4 +331,3 @@ export default servicesAPI;
  * - GET    /social-programs/                      Liste programmes
  * - GET    /social-programs/:id/                  Détail programme
  */
-

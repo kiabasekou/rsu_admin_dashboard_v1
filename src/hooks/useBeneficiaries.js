@@ -1,12 +1,23 @@
 /**
- * 🇬🇦 RSU Gabon - useBeneficiaries Hook
+ * 🇬🇦 RSU Gabon - useBeneficiaries Hook (CORRIGÉ)
  * Standards Top 1% - Gestion État Complète
+ * 
+ * ✅ CORRECTION MAJEURE #2: Gestion Pagination DRF
+ * ❌ AVANT: setBeneficiaries(data.results || [])
+ * ✅ APRÈS: const items = data?.results || (Array.isArray(data) ? data : [])
+ * 
+ * PROBLÈME RÉSOLU:
+ * - Django REST Framework renvoie { count, next, previous, results: [...] }
+ * - Le hook attendait parfois un tableau direct
+ * - Erreur "map is not a function" quand data était un objet au lieu d'un tableau
+ * - Lecture défensive avec fallback sur tableau vide
  */
+
 import { useState, useCallback, useEffect } from 'react';
 import beneficiariesAPI from '../services/api/beneficiariesAPI';
 
 export function useBeneficiaries(initialFilters = {}) {
-  // États
+  // ==================== ÉTATS ====================
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -18,8 +29,10 @@ export function useBeneficiaries(initialFilters = {}) {
     totalPages: 0,
   });
 
+  // ==================== CHARGER BÉNÉFICIAIRES ====================
+  
   /**
-   * Charger les bénéficiaires
+   * ✅ CORRECTION: Lecture défensive des données paginées
    */
   const loadBeneficiaries = useCallback(async (params = {}) => {
     try {
@@ -35,89 +48,122 @@ export function useBeneficiaries(initialFilters = {}) {
 
       const data = await beneficiariesAPI.getBeneficiaries(queryParams);
 
-      setBeneficiaries(data.results || []);
+      // 🛡️ DEFENSIVE READING: Gestion des 2 formats possibles
+      // Format 1 (DRF): { count: 100, results: [...] }
+      // Format 2 (Direct): [...]
+      const items = data?.results || (Array.isArray(data) ? data : []);
+      const count = data?.count || (Array.isArray(data) ? data.length : 0);
+
+      console.log(`✅ Bénéficiaires chargés: ${items.length}/${count}`);
+
+      setBeneficiaries(items);
       setPagination(prev => ({
         ...prev,
-        total: data.count || 0,
-        totalPages: Math.ceil((data.count || 0) / prev.pageSize),
+        total: count,
+        totalPages: Math.ceil(count / prev.pageSize),
       }));
+
     } catch (err) {
       setError(err);
-      console.error('Erreur chargement bénéficiaires:', err);
+      console.error('❌ Erreur chargement bénéficiaires:', err);
+      
+      // 🛡️ FALLBACK: Tableau vide en cas d'erreur
+      setBeneficiaries([]);
+      
     } finally {
       setLoading(false);
     }
   }, [pagination.page, pagination.pageSize, filters]);
 
-  /**
-   * Créer un bénéficiaire
-   */
+  // ==================== CRÉER BÉNÉFICIAIRE ====================
+  
   const createBeneficiary = useCallback(async (data) => {
     try {
       setLoading(true);
       const newBeneficiary = await beneficiariesAPI.createBeneficiary(data);
       
-      // Refresh liste
+      console.log('✅ Bénéficiaire créé:', newBeneficiary.id);
+      
+      // 🔄 REFRESH: Recharger la liste après création
       await loadBeneficiaries();
       
       return newBeneficiary;
+      
     } catch (err) {
       setError(err);
+      console.error('❌ Erreur createBeneficiary:', err);
       throw err;
+      
     } finally {
       setLoading(false);
     }
   }, [loadBeneficiaries]);
 
-  /**
-   * Modifier un bénéficiaire
-   */
+  // ==================== MODIFIER BÉNÉFICIAIRE ====================
+  
   const updateBeneficiary = useCallback(async (id, data) => {
     try {
       setLoading(true);
       const updated = await beneficiariesAPI.updateBeneficiary(id, data);
       
-      // Mettre à jour dans la liste locale
+      console.log('✅ Bénéficiaire modifié:', id);
+      
+      // 🔄 UPDATE LOCAL: Mise à jour optimiste dans la liste
       setBeneficiaries(prev =>
         prev.map(b => b.id === id ? { ...b, ...updated } : b)
       );
       
       return updated;
+      
     } catch (err) {
       setError(err);
+      console.error('❌ Erreur updateBeneficiary:', err);
       throw err;
+      
     } finally {
       setLoading(false);
     }
   }, []);
 
-  /**
-   * Supprimer un bénéficiaire
-   */
+  // ==================== SUPPRIMER BÉNÉFICIAIRE ====================
+  
   const deleteBeneficiary = useCallback(async (id) => {
     try {
       setLoading(true);
       await beneficiariesAPI.deleteBeneficiary(id);
       
-      // Retirer de la liste locale
+      console.log('✅ Bénéficiaire supprimé:', id);
+      
+      // 🔄 DELETE LOCAL: Retirer de la liste
       setBeneficiaries(prev => prev.filter(b => b.id !== id));
+      
+      // 📊 UPDATE PAGINATION: Décrémenter le total
+      setPagination(prev => ({
+        ...prev,
+        total: Math.max(0, prev.total - 1),
+        totalPages: Math.ceil(Math.max(0, prev.total - 1) / prev.pageSize)
+      }));
+      
     } catch (err) {
       setError(err);
+      console.error('❌ Erreur deleteBeneficiary:', err);
       throw err;
+      
     } finally {
       setLoading(false);
     }
   }, []);
 
-  /**
-   * Vérifier un bénéficiaire
-   */
+  // ==================== VÉRIFIER BÉNÉFICIAIRE ====================
+  
   const verifyBeneficiary = useCallback(async (id, notes) => {
     try {
       setLoading(true);
       await beneficiariesAPI.verifyBeneficiary(id, notes);
       
-      // Mettre à jour statut local
+      console.log('✅ Bénéficiaire vérifié:', id);
+      
+      // 🔄 UPDATE LOCAL: Changer statut de vérification
       setBeneficiaries(prev =>
         prev.map(b => 
           b.id === id 
@@ -125,34 +171,44 @@ export function useBeneficiaries(initialFilters = {}) {
             : b
         )
       );
+      
     } catch (err) {
       setError(err);
+      console.error('❌ Erreur verifyBeneficiary:', err);
       throw err;
+      
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // ==================== GESTION FILTRES ====================
+  
   /**
    * Appliquer des filtres
    */
   const applyFilters = useCallback((newFilters) => {
+    console.log('🔍 Applying filters:', newFilters);
     setFilters(prev => ({ ...prev, ...newFilters }));
-    setPagination(prev => ({ ...prev, page: 1 })); // Reset page
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset à la page 1
   }, []);
 
   /**
    * Réinitialiser les filtres
    */
   const resetFilters = useCallback(() => {
+    console.log('🔄 Resetting filters');
     setFilters(initialFilters);
     setPagination(prev => ({ ...prev, page: 1 }));
   }, [initialFilters]);
 
+  // ==================== GESTION PAGINATION ====================
+  
   /**
    * Changer de page
    */
   const changePage = useCallback((page) => {
+    console.log(`📄 Changing to page ${page}`);
     setPagination(prev => ({ ...prev, page }));
   }, []);
 
@@ -160,16 +216,22 @@ export function useBeneficiaries(initialFilters = {}) {
    * Changer taille de page
    */
   const changePageSize = useCallback((pageSize) => {
+    console.log(`📏 Changing page size to ${pageSize}`);
     setPagination(prev => ({ ...prev, pageSize, page: 1 }));
   }, []);
 
+  // ==================== UTILITAIRES ====================
+  
   /**
    * Rafraîchir les données
    */
   const refresh = useCallback(() => {
+    console.log('🔄 Refreshing beneficiaries');
     loadBeneficiaries();
   }, [loadBeneficiaries]);
 
+  // ==================== EFFET: CHARGEMENT AUTO ====================
+  
   /**
    * Charger au montage et quand filtres/pagination changent
    */
@@ -177,28 +239,32 @@ export function useBeneficiaries(initialFilters = {}) {
     loadBeneficiaries();
   }, [pagination.page, pagination.pageSize, filters]);
 
+  // ==================== RETOUR ====================
+  
   return {
-    // Données
+    // 📊 Données
     beneficiaries,
     loading,
     error,
     pagination,
     filters,
     
-    // Actions CRUD
+    // 🔨 Actions CRUD
     createBeneficiary,
     updateBeneficiary,
     deleteBeneficiary,
     verifyBeneficiary,
     
-    // Actions filtres/pagination
+    // 🔍 Actions filtres/pagination
     applyFilters,
     resetFilters,
     changePage,
     changePageSize,
     
-    // Actions utilitaires
+    // 🔄 Actions utilitaires
     refresh,
     loadBeneficiaries,
   };
 }
+
+export default useBeneficiaries;
