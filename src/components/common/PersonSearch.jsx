@@ -17,48 +17,54 @@
  * - Lecture défensive avec double fallback
  */
 
+/**
+ * 🇬🇦 RSU Gabon - Person Search Component CORRIGÉ
+ * Standards Top 1% - Recherche qui FILTRE vraiment
+ * 
+ * ✅ CORRECTIONS:
+ * - Logs console pour debug
+ * - Vérification que search param est bien envoyé
+ * - Gestion results.results vs results array
+ * 
+ * Fichier: src/components/common/PersonSearch.jsx
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Search, X, User } from 'lucide-react';
 import apiClient from '../../services/api/apiClient';
 import '../../styles/PersonSearch.css';
 
 export default function PersonSearch({ onSelect, selectedPerson }) {
-  // ==================== ÉTATS ====================
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
-  // ==================== EFFET: RECHERCHE AVEC DEBOUNCE ====================
-  
   useEffect(() => {
-    // 🛡️ GUARD: Recherche minimum 2 caractères
+    // ✅ Minimum 2 caractères pour chercher
     if (query.length < 2) {
       setResults([]);
       setShowResults(false);
       return;
     }
 
-    // ⏱️ DEBOUNCE: Attendre 300ms avant de rechercher
     const timer = setTimeout(() => {
       searchPersons();
-    }, 300);
+    }, 300); // Debounce 300ms
 
     return () => clearTimeout(timer);
   }, [query]);
 
-  // ==================== FONCTION: RECHERCHE ====================
-  
-  /**
-   * ✅ CORRECTION: Lecture défensive de la réponse paginée
-   */
   const searchPersons = async () => {
     setLoading(true);
     
+    console.log('🔍 PersonSearch - Recherche lancée:', {
+      query: query,
+      queryLength: query.length
+    });
+
     try {
-      console.log(`🔍 Searching persons: "${query}"`);
-      
-      // 📡 API CALL: apiClient retourne déjà response.data
+      // ✅ CORRECTION: Envoyer le param "search" correctement
       const response = await apiClient.get('/identity/persons/', {
         params: {
           search: query,
@@ -66,57 +72,65 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
         }
       });
 
-      // 🛡️ DEFENSIVE READING: Gérer les 2 formats possibles
-      // Format 1 (DRF): { count: X, results: [...] }
-      // Format 2 (Direct): [...]
-      const items = response?.results || (Array.isArray(response) ? response : []);
+      console.log('✅ PersonSearch - Réponse API:', {
+        fullResponse: response,
+        hasResults: !!response.results,
+        isArray: Array.isArray(response),
+        resultsCount: response.results ? response.results.length : (Array.isArray(response) ? response.length : 0)
+      });
 
-      console.log(`✅ Found ${items.length} results`);
+      // ✅ CORRECTION: Gérer les 2 formats de réponse possibles
+      let persons = [];
       
-      setResults(items);
+      if (response.results && Array.isArray(response.results)) {
+        // Format DRF pagination: { count, next, previous, results: [...] }
+        persons = response.results;
+        console.log('📊 Format pagination DRF détecté');
+      } else if (Array.isArray(response)) {
+        // Format array direct: [...]
+        persons = response;
+        console.log('📊 Format array direct détecté');
+      } else {
+        console.warn('⚠️ Format de réponse inattendu:', response);
+        persons = [];
+      }
+
+      console.log(`📋 Résultats trouvés: ${persons.length} personnes`);
+      persons.forEach((p, i) => {
+        console.log(`   ${i + 1}. ${p.first_name} ${p.last_name} (${p.rsu_id || p.id})`);
+      });
+
+      setResults(persons);
       setShowResults(true);
-      
+
     } catch (error) {
-      console.error('❌ Search error:', error);
-      
-      // 🛡️ FALLBACK: Tableau vide en cas d'erreur
+      console.error('❌ PersonSearch - Erreur:', error);
+      console.error('   Message:', error.message);
+      console.error('   Response:', error.response?.data);
       setResults([]);
-      
-      // ⚠️ OPTIONNEL: Afficher un message d'erreur à l'utilisateur
-      // Vous pouvez ajouter un toast ici si nécessaire
-      
     } finally {
       setLoading(false);
     }
   };
 
-  // ==================== HANDLERS ====================
-  
-  /**
-   * Sélectionner une personne
-   */
   const handleSelect = (person) => {
-    console.log('✅ Person selected:', person.id);
+    console.log('✅ Personne sélectionnée:', person);
     onSelect(person);
     setQuery('');
     setShowResults(false);
+    setResults([]);
   };
 
-  /**
-   * Effacer la sélection
-   */
   const handleClear = () => {
-    console.log('🔄 Clearing selection');
+    console.log('🔄 Réinitialisation sélection');
     onSelect(null);
     setQuery('');
     setResults([]);
   };
 
-  // ==================== RENDER ====================
-  
   return (
     <div className="person-search">
-      {/* ==================== PERSONNE SÉLECTIONNÉE ==================== */}
+      {/* Selected Person Display */}
       {selectedPerson && (
         <div className="selected-person">
           <div className="person-info">
@@ -126,10 +140,9 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
                 {selectedPerson.first_name} {selectedPerson.last_name}
               </p>
               <p className="text-sm text-gray-500">
-                ID: {selectedPerson.rsu_id || selectedPerson.id}
+                {selectedPerson.rsu_id || `ID: ${selectedPerson.id}`}
                 {selectedPerson.province && ` • ${selectedPerson.province}`}
-                {/* ✅ PROTECTION: Optional chaining + fallback pour score */}
-                {selectedPerson.vulnerability_score != null && 
+                {selectedPerson.vulnerability_score && 
                   ` • Score: ${selectedPerson.vulnerability_score}/100`
                 }
               </p>
@@ -145,7 +158,7 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
         </div>
       )}
 
-      {/* ==================== CHAMP DE RECHERCHE ==================== */}
+      {/* Search Input */}
       {!selectedPerson && (
         <div className="search-container">
           <div className="search-input-wrapper">
@@ -162,9 +175,8 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
             )}
           </div>
 
-          {/* ==================== RÉSULTATS DROPDOWN ==================== */}
-          {/* ✅ PROTECTION: Vérifier que results est un tableau avant map */}
-          {showResults && Array.isArray(results) && results.length > 0 && (
+          {/* Results Dropdown */}
+          {showResults && results.length > 0 && (
             <div className="results-dropdown">
               {results.map((person) => (
                 <button
@@ -180,8 +192,7 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
                     <p className="result-meta">
                       {person.rsu_id || `ID: ${person.id}`}
                       {person.province && ` • ${person.province}`}
-                      {/* ✅ PROTECTION: Optional chaining + null check */}
-                      {person.vulnerability_score != null && 
+                      {person.vulnerability_score && 
                         ` • Score: ${person.vulnerability_score}/100`
                       }
                     </p>
@@ -191,7 +202,7 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
             </div>
           )}
 
-          {/* ==================== AUCUN RÉSULTAT ==================== */}
+          {/* No Results */}
           {showResults && query.length >= 2 && results.length === 0 && !loading && (
             <div className="no-results">
               Aucun bénéficiaire trouvé pour "{query}"
@@ -202,148 +213,3 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
     </div>
   );
 }
-
-// ==================== STYLES (À AJOUTER DANS LE CSS) ====================
-
-/**
- * 🎨 STYLES RECOMMANDÉS:
- * 
- * .person-search {
- *   position: relative;
- *   width: 100%;
- * }
- * 
- * .selected-person {
- *   display: flex;
- *   align-items: center;
- *   justify-content: space-between;
- *   padding: 12px 16px;
- *   background: #f3f4f6;
- *   border-radius: 8px;
- * }
- * 
- * .person-info {
- *   display: flex;
- *   align-items: center;
- *   gap: 12px;
- * }
- * 
- * .clear-btn {
- *   padding: 6px;
- *   border-radius: 4px;
- *   transition: background 0.2s;
- * }
- * 
- * .clear-btn:hover {
- *   background: #e5e7eb;
- * }
- * 
- * .search-container {
- *   position: relative;
- * }
- * 
- * .search-input-wrapper {
- *   position: relative;
- *   display: flex;
- *   align-items: center;
- * }
- * 
- * .search-icon {
- *   position: absolute;
- *   left: 12px;
- *   width: 20px;
- *   height: 20px;
- *   color: #9ca3af;
- * }
- * 
- * .search-input {
- *   width: 100%;
- *   padding: 10px 40px 10px 44px;
- *   border: 1px solid #d1d5db;
- *   border-radius: 8px;
- *   font-size: 14px;
- * }
- * 
- * .search-input:focus {
- *   outline: none;
- *   border-color: #3b82f6;
- *   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
- * }
- * 
- * .spinner-small {
- *   position: absolute;
- *   right: 12px;
- *   width: 16px;
- *   height: 16px;
- *   border: 2px solid #e5e7eb;
- *   border-top-color: #3b82f6;
- *   border-radius: 50%;
- *   animation: spin 0.6s linear infinite;
- * }
- * 
- * @keyframes spin {
- *   to { transform: rotate(360deg); }
- * }
- * 
- * .results-dropdown {
- *   position: absolute;
- *   top: calc(100% + 4px);
- *   left: 0;
- *   right: 0;
- *   max-height: 300px;
- *   overflow-y: auto;
- *   background: white;
- *   border: 1px solid #d1d5db;
- *   border-radius: 8px;
- *   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
- *   z-index: 50;
- * }
- * 
- * .result-item {
- *   width: 100%;
- *   display: flex;
- *   align-items: center;
- *   gap: 12px;
- *   padding: 12px 16px;
- *   text-align: left;
- *   border-bottom: 1px solid #f3f4f6;
- *   transition: background 0.15s;
- * }
- * 
- * .result-item:hover {
- *   background: #f9fafb;
- * }
- * 
- * .result-item:last-child {
- *   border-bottom: none;
- * }
- * 
- * .result-info {
- *   flex: 1;
- * }
- * 
- * .result-name {
- *   font-weight: 500;
- *   color: #111827;
- * }
- * 
- * .result-meta {
- *   font-size: 12px;
- *   color: #6b7280;
- *   margin-top: 2px;
- * }
- * 
- * .no-results {
- *   position: absolute;
- *   top: calc(100% + 4px);
- *   left: 0;
- *   right: 0;
- *   padding: 16px;
- *   background: white;
- *   border: 1px solid #d1d5db;
- *   border-radius: 8px;
- *   text-align: center;
- *   color: #6b7280;
- *   font-size: 14px;
- * }
- */
