@@ -1,30 +1,14 @@
 /**
- * 🇬🇦 RSU Gabon - Person Search Component FINAL
- * Standards Top 1% - Recherche Bénéficiaire avec Autocomplete
- * Fichier: rsu_admin_dashboard_v1/src/components/common/PersonSearch.jsx
- */
-/**
- * 🇬🇦 RSU Gabon - Person Search Component (CORRIGÉ)
- * Standards Top 1% - Recherche Bénéficiaire avec Autocomplete
+ * 🇬🇦 RSU Gabon - Person Search Component FINAL FIXED
+ * Standards Top 1% - Recherche Bénéficiaire qui FILTRE vraiment
  * 
- * ✅ CORRECTION MAJEURE #2: Gestion Pagination DRF
- * ❌ AVANT: setResults(response.results || [])
- * ✅ APRÈS: const items = response?.results || (Array.isArray(response) ? response : [])
+ * 🐛 BUG RÉSOLU:
+ * ❌ AVANT: apiClient.get('/persons/', { params: { search: query } })
+ * ✅ APRÈS: apiClient.get(`/persons/?search=${encodeURIComponent(query)}`)
  * 
- * PROBLÈME RÉSOLU:
- * - API renvoie { count, results: [...] } mais le code tentait de mapper sur l'objet
- * - Erreur "map is not a function" car results.map() était appelé sur un objet
- * - Lecture défensive avec double fallback
- */
-
-/**
- * 🇬🇦 RSU Gabon - Person Search Component CORRIGÉ
- * Standards Top 1% - Recherche qui FILTRE vraiment
- * 
- * ✅ CORRECTIONS:
- * - Logs console pour debug
- * - Vérification que search param est bien envoyé
- * - Gestion results.results vs results array
+ * CAUSE RACINE:
+ * - apiClient ne supporte PAS la syntaxe { params: {...} } d'axios
+ * - Il faut construire l'URL manuellement avec les paramètres
  * 
  * Fichier: src/components/common/PersonSearch.jsx
  */
@@ -64,13 +48,13 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
     });
 
     try {
-      // ✅ CORRECTION: Envoyer le param "search" correctement
-      const response = await apiClient.get('/identity/persons/', {
-        params: {
-          search: query,
-          page_size: 10
-        }
-      });
+      // ✅ CORRECTION CRITIQUE: Construire URL manuellement
+      const encodedQuery = encodeURIComponent(query);
+      const url = `/identity/persons/?search=${encodedQuery}&page_size=10`;
+      
+      console.log('🌐 URL complète:', url);
+
+      const response = await apiClient.get(url);
 
       console.log('✅ PersonSearch - Réponse API:', {
         fullResponse: response,
@@ -96,7 +80,7 @@ export default function PersonSearch({ onSelect, selectedPerson }) {
       }
 
       console.log(`📋 Résultats trouvés: ${persons.length} personnes`);
-      persons.forEach((p, i) => {
+      persons.slice(0, 10).forEach((p, i) => {
         console.log(`   ${i + 1}. ${p.first_name} ${p.last_name} (${p.rsu_id || p.id})`);
       });
 

@@ -1,0 +1,212 @@
+{
+  "projet": "RSU Gabon Dashboard",
+  "version": "1.0.0",
+  "api_base_url": "http://localhost:8000/api/v1",
+  "details": {
+    "environment": {
+      "REACT_APP_API_URL": "http://localhost:8000/api/v1",
+      "REACT_APP_ENV": "development",
+      "REACT_APP_VERSION": "1.0.0",
+      "REACT_APP_DEBUG": "true",
+      "REACT_APP_LOG_LEVEL": "debug",
+      "REACT_APP_ENABLE_ANALYTICS": "true",
+      "REACT_APP_ENABLE_EXPORT": "true"
+    },
+    "apiEndpoints": [
+      {
+        "file": "components\\Dashboard\\AnalyticsTab\\KPIMetrics.jsx",
+        "routes": [
+          "POST: /analytics/kpi-metrics/${kpiId}/calculate/"
+        ]
+      },
+      {
+        "file": "components\\Dashboard\\AnalyticsTab\\TrendsCharts.jsx",
+        "routes": [
+          "GET: /analytics/dashboard/"
+        ]
+      },
+      {
+        "file": "components\\Dashboard\\BeneficiariesFilters.jsx",
+        "routes": [
+          "GET: /identity/persons/?${params.toString()}"
+        ]
+      },
+      {
+        "file": "components\\Dashboard\\BeneficiariesTab.jsx",
+        "routes": [
+          "GET: /identity/persons/?${params.toString()}"
+        ]
+      },
+      {
+        "file": "components\\Dashboard\\DeduplicationTab\\MergeWorkflow.jsx",
+        "routes": [
+          "POST: /deduplication/merges/${candidateId}/rollback/"
+        ]
+      },
+      {
+        "file": "components\\Dashboard\\DeduplicationTab\\MLDashboard.jsx",
+        "routes": [
+          "GET: /deduplication/ml-models/statistics/",
+          "POST: /deduplication/ml-models/${modelId}/deploy/"
+        ]
+      },
+      {
+        "file": "services\\api\\analyticsAPI.js",
+        "routes": [
+          "GET: /analytics/dashboard/",
+          "POST: /analytics/kpi-metrics/${kpiId}/calculate/",
+          "GET: /analytics/data-exports/",
+          "GET: /analytics/dashboard-configs/",
+          "POST: /analytics/dashboard-configs/${configId}/activate/",
+          "POST: /analytics/dashboard-configs/${configId}/duplicate/",
+          "GET: /analytics/report-templates/",
+          "GET: /analytics/data-exports/${exportId}/status/",
+          "GET: /analytics/province-stats/",
+          "GET: /analytics/province-stats/${provinceCode}/",
+          "GET: /services/analytics/demographic_insights/",
+          "GET: /services/analytics/geographic_distribution/",
+          "GET: /services/analytics/vulnerability_stats/",
+          "GET: /analytics/dashboard/trends/",
+          "GET: /analytics/alerts/"
+        ]
+      },
+      {
+        "file": "services\\api\\analyticsService.js",
+        "routes": [
+          "GET: /services/analytics/dashboard/",
+          "GET: /services/analytics/vulnerability-stats/",
+          "GET: /services/analytics/geographic-distribution/",
+          "GET: /services/analytics/demographic-insights/",
+          "GET: /services/vulnerability-assessments/critical-cases/"
+        ]
+      },
+      {
+        "file": "services\\api\\apiClient.js",
+        "routes": [
+          "GET: content-type"
+        ]
+      },
+      {
+        "file": "services\\api\\beneficiariesAPI.js",
+        "routes": [
+          "GET: /identity/persons/${id}/",
+          "DELETE: /identity/persons/${id}/",
+          "GET: /identity/persons/?search=${identifier}",
+          "GET: /identity/persons/statistics/"
+        ]
+      },
+      {
+        "file": "services\\api\\deduplicationAPI.js",
+        "routes": [
+          "GET: /deduplication/detections/${detectionId}/",
+          "GET: /deduplication/detections/statistics/",
+          "GET: /deduplication/detections/statistics/",
+          "GET: /deduplication/scores/high_confidence/",
+          "GET: /deduplication/scores/requires_review/",
+          "GET: /deduplication/scores/fraud_suspected/",
+          "GET: /deduplication/scores/${scoreId}/",
+          "GET: /deduplication/merges/pending/",
+          "GET: /deduplication/merges/statistics/",
+          "POST: /deduplication/merges/${mergeId}/execute_merge/",
+          "GET: /deduplication/merges/${mergeId}/",
+          "GET: /deduplication/ml-models/",
+          "GET: /deduplication/ml-models/production_models/",
+          "GET: /deduplication/ml-models/statistics/",
+          "POST: /deduplication/ml-models/${modelId}/deploy/",
+          "GET: /deduplication/ml-models/${modelId}/",
+          "GET: /deduplication/dashboard/"
+        ]
+      },
+      {
+        "file": "services\\api\\familyGraphAPI.js",
+        "routes": [
+          "GET: /family-graph/relationships/${relationshipId}/",
+          "DELETE: /family-graph/relationships/${relationshipId}/",
+          "GET: /family-graph/networks/${networkId}/",
+          "DELETE: /family-graph/networks/${networkId}/",
+          "GET: /family-graph/dependencies/${dependencyId}/",
+          "DELETE: /family-graph/dependencies/${dependencyId}/",
+          "GET: /family-graph/statistics/",
+          "GET: /family-graph/dashboard/"
+        ]
+      },
+      {
+        "file": "services\\api\\programsAPI.js",
+        "routes": [
+          "GET: /programs/programs/${id}/",
+          "GET: /programs/programs/${id}/statistics/",
+          "GET: /programs/programs/${id}/export/?format=${format}",
+          "GET: /programs/programs/active/",
+          "GET: /programs/enrollments/${id}/",
+          "GET: /programs/enrollments/pending/",
+          "GET: /programs/enrollments/export/?program=${programId}&format=${format}",
+          "GET: /programs/payments/${id}/",
+          "GET: /programs/payments/pending/",
+          "GET: /programs/payments/history/?${params.toString()}",
+          "GET: /programs/payments/export/?program=${programId}&format=${format}",
+          "GET: /programs/categories/",
+          "GET: /programs/categories/${id}/",
+          "GET: /programs/programs/statistics/",
+          "GET: /programs/dashboard/",
+          "GET: /programs/programs/${programId}/performance/?period=${period}",
+          "GET: /programs/programs/${programId}/impact/"
+        ]
+      },
+      {
+        "file": "services\\api\\servicesAPI.js",
+        "routes": [
+          "GET: /services/vulnerability-assessments/statistics/",
+          "GET: /services/eligibility/${id}/",
+          "GET: /services/social-programs/${id}/"
+        ]
+      }
+    ],
+    "constants": [
+      {
+        "file": "config\\env.js",
+        "vars": [
+          "ENV"
+        ]
+      },
+      {
+        "file": "constants\\apiConfig.js",
+        "vars": [
+          "API_CONFIG"
+        ]
+      },
+      {
+        "file": "utils\\constants.js",
+        "vars": [
+          "PROVINCES",
+          "VERIFICATION_STATUS",
+          "VULNERABILITY_THRESHOLDS",
+          "GENDER_OPTIONS",
+          "HOUSING_TYPES",
+          "ID_DOCUMENT_TYPES",
+          "PROGRAM_STATUS",
+          "PAYMENT_FREQUENCIES",
+          "ERROR_MESSAGES"
+        ]
+      },
+      {
+        "file": "utils\\exportUtils.js",
+        "vars": [
+          "BENEFICIARIES_EXPORT_COLUMNS"
+        ]
+      },
+      {
+        "file": "utils\\prefetch.js",
+        "vars": [
+          "PREFETCH_CONFIG"
+        ]
+      }
+    ],
+    "hooks": [
+      "hooks\\useBeneficiaries.js",
+      "hooks\\useDashboard.js",
+      "hooks\\useDebounce.js",
+      "hooks\\useFamilyGraph.js",
+      "hooks\\usePrograms.js"
+    ]
+  }
+}
